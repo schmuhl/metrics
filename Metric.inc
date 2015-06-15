@@ -17,7 +17,8 @@ class Metric {
 	var $allowZero;
 	
 	var $recordings;
-	
+
+    var $precision = 3;
 	static $types = array('decimal','integer','percentage');
 	static $frequencies = array('daily','hourly','minutely');
 	
@@ -145,8 +146,19 @@ class Metric {
 	 * @param float $value
 	 * @return string 
 	 */
-	public function value ( $value ) {
-		if ( $this->type == 'percentage' ) return $value."%";
+	public function value ( $value=null, $justNumber=false ) {
+        if ( !isset($value) ) $value = $this->value;
+        if ( $this->type == 'integer' ) return round($value);
+		if ( $this->type == 'percentage' ) {
+            if ( isset($this->precision) ) {
+                if ( $justNumber ) return number_format($value,$this->precision);
+                else return number_format($value,$this->precision).'%';
+            } else {
+                if ( $justNumber ) return $value;
+                else return $value."%";
+            }
+        }
+        else if ( isset($this->precision) ) return number_format($value,$this->precision);
 		else if ( $this->type == 'decimal' ) {
 		    if ( $value < 0.1 ) return number_format($value,4);
 		    if ( $value < 1 ) return number_format($value,3);

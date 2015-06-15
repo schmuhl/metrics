@@ -6,7 +6,7 @@
  */
 
 session_start();
-require "../common/database.inc";
+require "../projects/common/database.inc";
 require "Metric.inc";
 $mysqli = dbConnect("metrics","127.0.0.1","root","root");
 date_default_timezone_set("UTC");

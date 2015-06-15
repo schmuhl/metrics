@@ -58,7 +58,7 @@ if ( isset($_GET['show']) ) {
         header("Content-type: text/csv");
         header("Content-Disposition: attachment; filename=$metric->name.csv");
         echo "\"Date\",\"$metric->name\"\n";
-        foreach ( $metric->recordings as $recording ) echo "\"$recording->recorded\",\"$recording->value\"\n";
+        foreach ( $metric->recordings as $recording ) echo "\"$recording->recorded\",\"".$metric->value($recording->value)."\"\n";
         exit(0);
     }
 } else {
@@ -84,7 +84,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 	var data = google.visualization.arrayToDataTable([
 		['Date', 'Value'],
 		<?php foreach ( $metric->recordings as $recording ) { ?>
-		['<?php echo $metric->toDate($recording->recorded); ?>',  <?php echo $recording->value; ?>],
+		['<?php echo $metric->toDate($recording->recorded); ?>',  <?php echo $metric->value($recording->value,true); ?>],
 		<?php } ?>
 	]);
 
@@ -192,9 +192,9 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 			<img src="images/recordingEdit.png" alt="Edit recording" titl="Edit recording" style="cursor: pointer;" onclick="$('#recording<?php echo $i; ?>Editable').show(); $('#recording<?php echo $i; ?>ValueColumn').hide();" />
 		</td>
 		<td id="recording<?php echo $i; ?>Editable" style="display: none;">
-			<input id="recording<?php echo $i; ?>NewValue" type="text" value="<?php echo $recording->value; ?>" />
-			<input type="button" value="Save" onclick="deleteRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>','<?php echo $recording->value; ?>'); if ( saveRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>',$('#recording<?php echo $i; ?>NewValue').val()) ) { $('#recording<?php echo $i; ?>Value').html($('#recording<?php echo $i; ?>NewValue').val()); $('#recording<?php echo $i; ?>Editable').hide(); $('#recording<?php echo $i; ?>ValueColumn').show(); }" />
-			<input type="button" value="Delete" onclick="if ( confirm('Are you sure that you want to delete this?') && deleteRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>','<?php echo $recording->value; ?>') ) $('#recording<?php echo $i; ?>').hide();" />
+			<input id="recording<?php echo $i; ?>NewValue" type="text" value="<?php echo $metric->value($recording->value); ?>" />
+			<input type="button" value="Save" onclick="deleteRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>','<?php echo $metric->value($recording->value); ?>'); if ( saveRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>',$('#recording<?php echo $i; ?>NewValue').val()) ) { $('#recording<?php echo $i; ?>Value').html($('#recording<?php echo $i; ?>NewValue').val()); $('#recording<?php echo $i; ?>Editable').hide(); $('#recording<?php echo $i; ?>ValueColumn').show(); }" />
+			<input type="button" value="Delete" onclick="if ( confirm('Are you sure that you want to delete this?') && deleteRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>','<?php echo $metric->value($recording->value); ?>') ) $('#recording<?php echo $i; ?>').hide();" />
 		</td>
 	</tr>
 	<?php } ?>
