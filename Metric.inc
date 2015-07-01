@@ -1,7 +1,10 @@
 <?php
 /* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * The Metric object
+ * @copyright Ben Schmuhl
+ * @since
+ * @version
+ * @package Metrics
  */
 
 require 'MetricRecording.inc';
@@ -20,7 +23,7 @@ class Metric {
 
     var $precision = 3;
 	static $types = array('decimal','integer','percentage');
-	static $frequencies = array('daily','hourly','minutely');
+	static $frequencies = array('monthly','daily','hourly','minutely');
 	
 	
 	/**
@@ -77,8 +80,8 @@ class Metric {
 	 * @return array An array of MetricRecording objects 
 	 */
 	public function getRecordings ( $count=null, $frequency=null ) {
-        if ( isset($frequency) && !in_array($frequency,Metric::$frequencies) ) return null;
-        if ( !isset($frequency) ) $frequency = $this->frequency;
+        if ( isset($frequency) && !in_array($frequency,Metric::$frequencies) ) return null;  // illegal frequency
+        if ( !isset($frequency) ) $frequency = $this->frequency; // default to the metric's frequency
 		$this->recordings = MetricRecording::getRecordings($this->metricID,$count,$frequency);
 		usort($this->recordings,"MetricRecording::sortByDate");
 		return $this->recordings;

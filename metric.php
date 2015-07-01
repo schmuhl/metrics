@@ -67,7 +67,7 @@ if ( isset($_GET['show']) ) {
 }
 
 
-// get the recordings
+// get the recordings @todo the number of recordings should change with the frequency?
 $metric->getRecordings(50,$frequency);
 //print_r($metric);
 
