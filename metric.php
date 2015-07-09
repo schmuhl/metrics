@@ -72,6 +72,35 @@ $metric->getRecordings(50,$frequency);
 //print_r($metric);
 
 
+/*
+$count = 200;
+$hourly = $metric->getRecordings($count,'hourly');
+$daily = $metric->getRecordings($count,'daily');
+?>
+<table>
+    <?php for ( $i=0; $i<count($hourly); $i++ ) {
+        $hour = $hourly[$i];
+        $day = isset($daily[$i]) ? $daily[$i] : new MetricRecording();
+        ?>
+    <tr>
+        <td><?php echo $hour->recorded; ?></td>
+        <td><?php echo $hour->value; ?></td>
+        <td></td>
+        <td><?php echo $day->recorded; ?></td>
+        <td><?php echo $day->value; ?></td>
+    </tr>
+        <?php
+    } ?>
+</table>
+
+<?php
+die();
+
+*/
+
+
+
+
 if ( $showHeading ) showHeader("Metrics: $metric->name");
 ?>
 

@@ -35,10 +35,10 @@ class MetricRecording {
 		if ( !is_numeric($this->recorded) ) $this->recorded = strtotime($this->recorded);
 		if ( $this->recorded == 0 ) return false;  // don't record no date
 		// there are limits to what we will save
-        if ( $frequency == 'monthly' ) $sql = "DELETE FROM metricRecordings WHERE metricID=$this->metricID AND month(recorded) = '".date("m",$this->recorded)."' AND year(recorded) = '".date("Y",$this->recorded)."';";
-        else if ( $frequency == 'daily' ) $sql = "DELETE FROM metricRecordings WHERE metricID=$this->metricID AND recorded >= '".date("Y-m-d 00:00:00",$this->recorded)."' AND recorded <= '".date("Y-m-d 23:59:59",$this->recorded)."';";
-		else if ( $frequency == 'hourly' ) $sql = "DELETE FROM metricRecordings WHERE metricID=$this->metricID AND recorded >= '".date("Y-m-d H:00:00",$this->recorded)."' AND recorded <= '".date("Y-m-d H:59:59",$this->recorded)."';";
-		else if ( $frequency == 'minutely' ) $sql = "DELETE FROM metricRecordings WHERE metricID=$this->metricID AND recorded >= '".date("Y-m-d H:i:00",$this->recorded)."' AND recorded <= '".date("Y-m-d H:i:59",$this->recorded)."';";
+        if ( $frequency == 'monthly' ) $sql = "DELETE FROM metricRecordings WHERE metricID=$this->metricID AND year(recorded) = '".date("Y",$this->recorded)."' AND month(recorded) = '".date("m",$this->recorded)."';";
+        else if ( $frequency == 'daily' ) $sql = "DELETE FROM metricRecordings WHERE metricID=$this->metricID AND date(recorded) = '".date("Y-m-d",$this->recorded)."';";
+		else if ( $frequency == 'hourly' ) $sql = "DELETE FROM metricRecordings WHERE metricID=$this->metricID AND date(recorded) = '".date("Y-m-d",$this->recorded)."' AND hour(recorded) = '".date("H",$this->recorded)."';";
+		else if ( $frequency == 'minutely' ) $sql = "DELETE FROM metricRecordings WHERE metricID=$this->metricID AND date(recorded) = '".date("Y-m-d",$this->recorded)."' AND hour(recorded) = '".date("H",$this->recorded)."' AND minute(recorded) = '".date("i",$this->recorded)."';";
 		else $sql = null;
 		if ( !empty($sql) ) {
             $result = dbQuery($sql);  //echo $sql;
@@ -95,7 +95,7 @@ class MetricRecording {
         }
         $sql .= ' ORDER BY recorded DESC';
 		if ( is_numeric($count) ) $sql .= " LIMIT $count;";
-        //addMessage($sql);
+        //die($sql);
 		$result = dbQuery($sql);
 		$recordings = array();
 		while ( $row = $result->fetch_array() ) {
