@@ -77,13 +77,17 @@ class MetricRecording {
 	 * @param int $metricID
 	 * @param int $count The number of recent recordings to get
      * @param string $frequency Daily, hourly, etc.
+     * @param string $from The date of recordings to start at (mutually exclusive with $count)
+     * @param string $to The date of recordings to stop at
 	 * @return array An array of MetricRecording objects 
 	 */
-	public static function getRecordings ( $metricID, $count=null, $frequency=null ) {
+	public static function getRecordings ( $metricID, $count=null, $frequency=null, $from=null, $to=null ) {
 		if ( !is_numeric($metricID) ) return null;
         if ( isset($frequency) && !in_array($frequency, Metric::$frequencies)) return null;  // must be a valid frequency
 
         $sql = "SELECT value, sum(value) as v, recorded FROM metricRecordings WHERE metricID=$metricID";
+        if ( isset($from) ) $sql .= " AND recorded>='".date('Y-m-d',strtotime($from))."'";
+        if ( isset($to) ) $sql .= " AND recorded<'".date('Y-m-d',strtotime($to))."'";
         if ( $frequency == 'monthly' ) {
             $sql .= ' GROUP BY year(recorded), month(recorded)';
         } else if ( $frequency == 'daily' ) {

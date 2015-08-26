@@ -77,12 +77,14 @@ class Metric {
 	 * Get the recordings for this given metric
      * @param int $count The number or results to return, or null for all
      * @param string $frequency The frequency to report on, or null for default
+     * @param string $from The date of recordings to start at (mutually exclusive with $count)
+     * @param string $to The date of recordings to stop at
 	 * @return array An array of MetricRecording objects 
 	 */
-	public function getRecordings ( $count=null, $frequency=null ) {
+	public function getRecordings ( $count=null, $frequency=null, $from=null, $to=null ) {
         if ( isset($frequency) && !in_array($frequency,Metric::$frequencies) ) return null;  // illegal frequency
         if ( !isset($frequency) ) $frequency = $this->frequency; // default to the metric's frequency
-		$this->recordings = MetricRecording::getRecordings($this->metricID,$count,$frequency);
+		$this->recordings = MetricRecording::getRecordings($this->metricID,$count,$frequency,$from,$to);
 		usort($this->recordings,"MetricRecording::sortByDate");
 		return $this->recordings;
 	}

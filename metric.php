@@ -43,6 +43,26 @@ if ( isset($_GET['frequency']) && in_array($_GET['frequency'],Metric::$frequenci
 } else $frequency = $metric->frequency;
 
 
+// what timeframes to look at?
+$from = isset($_GET['from']) ? $_GET['from'] : ( isset($_SESSION['from']) ? $_SESSION['from'] : null );
+if ( isset($from) ) {
+    if ( is_numeric($from) ) $from = date('Y-m-d H:i:s',$from);
+    else $from = date('Y-m-d H:i:s',strtotime($from));
+    $_SESSION['from'] = $from;
+}
+$to = isset($_GET['to']) ? $_GET['to'] : ( isset($_SESSION['to']) ? $_SESSION['to'] : null );
+if ( isset($to) ) {
+    if ( is_numeric($to) ) $to = date('Y-m-d H:i:s',$to);
+    else $to = date('Y-m-d H:i:s',strtotime($to));
+    $_SESSION['to'] = $to;
+}
+
+
+// Are we comparing two time frames?
+$compare = isset($_GET['compare']) ? $_GET['compare'] : ( isset($_SESSION['compare']) ? $_SESSION['compare'] : null );
+if ( isset($compare) ) $_SESSION['compare'] = $compare;
+
+
 // what to show?
 if ( isset($_GET['show']) ) {
     if ( $_GET['show'] == 'graph' ) {
@@ -55,10 +75,37 @@ if ( isset($_GET['show']) ) {
         exit(0);
     } else if ( $_GET['show'] == 'csv' ) {
         $metric->getRecordings(null,$frequency);
+        if ( $metric->allowZero ) {
+            if ( $frequency == 'daily' ) {
+                // find the start and end times
+                $start = null;
+                $end = null;
+                $recordings = array();
+                foreach ( $metric->recordings as $recording ) {
+                    if ( !isset($start) || $recording->recorded < $start ) $start = $recording->recorded;
+                    if ( !isset($end) || $recording->recorded > $end ) $end = $recording->recorded;
+                    $recordings[date("Y-m-d",strtotime($recording->recorded))] = $recording;
+                }
+                // loop through the times and make sure that there is a recording for each day
+                $i = date("Y-m-d",strtotime($start));
+                while ( $i < $end ) {
+                    if ( !isset($recordings[$i]) ) {
+                        $emptyRecording = new MetricRecording();
+                        $emptyRecording->value = 0;
+                        $emptyRecording->recorded = $i;
+                        $recordings[$i] = $emptyRecording;
+                        //echo "Added a recording on $i<br/>";
+                    }
+                    $i = date("Y-m-d", strtotime($i) + 86401);  // move to tomorrow
+                }
+            }
+        }
+        usort($recordings,'MetricRecording::sortByDate');
+        //die("<pre>".print_r($recordings,true)."</pre>");
         header("Content-type: text/csv");
         header("Content-Disposition: attachment; filename=$metric->name.csv");
         echo "\"Date\",\"$metric->name\"\n";
-        foreach ( $metric->recordings as $recording ) echo "\"$recording->recorded\",\"".$metric->value($recording->value)."\"\n";
+        foreach ( $recordings as $recording ) echo "\"$recording->recorded\",\"".$metric->value($recording->value)."\"\n";
         exit(0);
     }
 } else {
@@ -67,8 +114,17 @@ if ( isset($_GET['show']) ) {
 }
 
 
-// get the recordings @todo the number of recordings should change with the frequency?
-$metric->getRecordings(50,$frequency);
+// Get all of the needed recordings
+if ( isset($compare) ) {
+    $from2 = date('Y-m-d H:i:s',strtotime("$from $compare"));
+    $to2 = date('Y-m-d H:i:s',strtotime("$to $compare"));
+    //echo "$from $compare = from is $from2 and to is $to2";
+    if ( $from2 != $from && $to2 != $to ) $recordings2 = $metric->getRecordings(null,$frequency,$from2,$to2);  // get the comparison date range
+    $metric->getRecordings(null,$frequency,$from,$to);  // get the date range
+} else {
+    $count = ( isset($from) && isset($to) ) ? null : 50;  // default to 50
+    $metric->getRecordings(50,$frequency,$from,$to);
+}
 //print_r($metric);
 
 
@@ -111,9 +167,12 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 	google.setOnLoadCallback(drawChart);
 	function drawChart() {
 	var data = google.visualization.arrayToDataTable([
-		['Date', 'Value'],
-		<?php foreach ( $metric->recordings as $recording ) { ?>
-		['<?php echo $metric->toDate($recording->recorded); ?>',  <?php echo $metric->value($recording->value,true); ?>],
+		['Date', 'Value' <?php if ( isset($recordings2) ) echo ", 'Comparison'"; ?> ],
+        <?php $max = isset($recordings2) ? max(count($recordings2),count($metric->recordings)) : count($metric->recordings); // how many data points to show ?>
+		<?php for ( $i = 0; $i < $max; $i++ ) {
+		     $recording = $metric->recordings[$i];
+		     ?>
+		['<?php echo $metric->toDate($recording->recorded); ?>',  <?php echo $metric->value($recording->value,true); ?> <?php if ( isset($recordings2) ) echo ", ".$metric->value($recordings2[$i]->value); ?>],
 		<?php } ?>
 	]);
 
@@ -122,18 +181,46 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 		animation: {
 			duration: 1000,
 			easing: 'out'
-		},
-		curveType: 'function',
-		pointSize: 5
+		}//,
+		//curveType: 'function',
+		//pointSize: 5
 	};
 
-	var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+	var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
 	chart.draw(data, options);
 	}
 </script>
 <?php } ?>
     
 <?php if ( $showHeading ) { ?>
+
+<div style="float: right;">
+    <form action="metric.php">
+        From: <input type="text" name="from" value="<?php echo $from; ?>" />
+        To: <input type="text" name="to" value="<?php echo $to; ?>" />
+        <input type="submit" value="Set" />
+        <input type="hidden" name="metric" value="<?php echo $metric->metricID; ?>" />
+        <input type="hidden" name="compare" value="<?php echo $compare; ?>" />
+        <input type="hidden" name="frequency" value="<?php echo $frequency; ?>" />
+    </form>
+    <br/>
+    Frequency:
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=hourly">hourly</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily">daily</a>
+    <br/>
+    Compare to last:
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-1year">year</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-4months">trimester</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-1month">month</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-7days">week</a>
+    <br/>
+    Output:
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>">HTML</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>&show=graph">Graph</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>&show=json">JSON</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>&show=csv">CSV</a>
+</div>
+
 <h1><?php echo $metric->name; ?></h1>
 <p>
 	<?php echo $metric->description; ?> 
@@ -210,21 +297,40 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 	<tr>
 		<th>Recorded</th>
 		<th>Value</th>
+        <?php if ( isset($recordings2) ) { ?>
+        <td> &nbsp; </td>
+        <th>Recorded</th>
+        <th>Comparison</th>
+        <?php } ?>
 	</tr>
 	<?php 
 	$i = 0;
-	foreach ( $metric->recordings as $recording ) { ?>
+    $max = isset($recordings2) ? max(count($recordings2),count($metric->recordings)) : count($metric->recordings); // how many data points to show?
+    for ( $i = 0; $i < $max; $i++ ) {
+        $recording = isset($metric->recordings[$i]) ? $metric->recordings[$i] : null; ?>
 	<tr id="recording<?php echo ++$i; ?>">
+        <?php if ( isset($recording) ) { ?>
 		<td><?php echo date("n/d/Y g:ia",strtotime($recording->recorded)); ?></td>
 		<td align="right" id="recording<?php echo $i; ?>ValueColumn">
 			<span id="recording<?php echo $i; ?>Value"><?php echo $metric->value($recording->value); ?></span>
-			<img src="images/recordingEdit.png" alt="Edit recording" titl="Edit recording" style="cursor: pointer;" onclick="$('#recording<?php echo $i; ?>Editable').show(); $('#recording<?php echo $i; ?>ValueColumn').hide();" />
+			<img src="images/recordingEdit.png" alt="Edit recording" title="Edit recording" style="cursor: pointer;" onclick="$('#recording<?php echo $i; ?>Editable').show(); $('#recording<?php echo $i; ?>ValueColumn').hide();" />
 		</td>
 		<td id="recording<?php echo $i; ?>Editable" style="display: none;">
 			<input id="recording<?php echo $i; ?>NewValue" type="text" value="<?php echo $metric->value($recording->value); ?>" />
 			<input type="button" value="Save" onclick="deleteRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>','<?php echo $metric->value($recording->value); ?>'); if ( saveRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>',$('#recording<?php echo $i; ?>NewValue').val()) ) { $('#recording<?php echo $i; ?>Value').html($('#recording<?php echo $i; ?>NewValue').val()); $('#recording<?php echo $i; ?>Editable').hide(); $('#recording<?php echo $i; ?>ValueColumn').show(); }" />
 			<input type="button" value="Delete" onclick="if ( confirm('Are you sure that you want to delete this?') && deleteRecording('<?php echo $metric->metricID; ?>','<?php echo strtotime($recording->recorded); ?>','<?php echo $metric->value($recording->value); ?>') ) $('#recording<?php echo $i; ?>').hide();" />
 		</td>
+        <?php } else { ?>
+        <td></td>
+        <td></td>
+        <?php } ?>
+
+
+        <?php if ( isset($recordings2[$i]) ) { ?>
+            <td> &nbsp; </td>
+            <td><?php echo date("n/d/Y g:ia",strtotime($recordings2[$i]->recorded)); ?></td>
+            <td align="right"><?php echo $metric->value($recordings2[$i]->value); ?></td>
+        <?php } ?>
 	</tr>
 	<?php } ?>
 </table>
