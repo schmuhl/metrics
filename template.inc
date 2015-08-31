@@ -48,4 +48,38 @@ function showFooter () {
 </html>
     <?php
 }
+
+
+/**
+ * Return the margin of error for a statistical sample
+ * @param $std_dev
+ * @param $sample_size
+ * @param float $z defaults to 95%
+ * @return float
+ */
+function margin_of_error ( $std_dev, $sample_size, $z=1.96 ) {
+    return $z*$std_dev/sqrt($sample_size);
+}
+
+function standard_deviation(array $a, $sample = false) {
+    $n = count($a);
+    if ($n === 0) {
+        trigger_error("The array has zero elements", E_USER_WARNING);
+        return false;
+    }
+    if ($sample && $n === 1) {
+        trigger_error("The array has only 1 element", E_USER_WARNING);
+        return false;
+    }
+    $mean = array_sum($a) / $n;
+    $carry = 0.0;
+    foreach ($a as $val) {
+        $d = ((double) $val) - $mean;
+        $carry += $d * $d;
+    };
+    if ($sample) {
+        --$n;
+    }
+    return sqrt($carry / $n);
+}
 ?>

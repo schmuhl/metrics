@@ -149,6 +149,7 @@ class Metric {
 	/** 
 	 * Show the value, given the type of metric
 	 * @param float $value
+     * @param boolean $justNumber Specify whether or not to return just the number or to return commas and %, $ as well
 	 * @return string 
 	 */
 	public function value ( $value=null, $justNumber=false ) {

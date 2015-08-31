@@ -121,6 +121,13 @@ if ( isset($compare) ) {
     //echo "$from $compare = from is $from2 and to is $to2";
     if ( $from2 != $from && $to2 != $to ) $recordings2 = $metric->getRecordings(null,$frequency,$from2,$to2);  // get the comparison date range
     $metric->getRecordings(null,$frequency,$from,$to);  // get the date range
+
+    if ( count($metric->recordings) < count($recordings2) ) {  // more data points in the comparison, swap them
+        $temp = $metric->recordings;
+        $metric->recordings = $recordings2;
+        $recordings2 = $temp;
+        $temp = null;
+    }
 } else {
     $count = ( isset($from) && isset($to) ) ? null : 50;  // default to 50
     $metric->getRecordings(50,$frequency,$from,$to);
@@ -213,6 +220,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-4months">trimester</a>
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-1month">month</a>
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-7days">week</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=">NONE</a>
     <br/>
     Output:
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>">HTML</a>
@@ -227,6 +235,25 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 	(<?php echo ucwords($metric->type); ?>, <?php echo ucwords($metric->frequency); ?>)
 	<img src="images/metricEdit.png" alt="Edit metric" title="Edit metric" onclick="$('#editMetricForm').show()" style="cursor: pointer;" />
 </p>
+<div class="stats">
+    <?php
+    // Calculate the statistics on this set of numbers
+    $total = 0;
+    $count = 0;
+    $values = array();
+    foreach ( $metric->recordings as $recording ) {
+        $total += $recording->value;
+        $count ++;
+        $values []= $recording->value;
+    }
+    $average = $total/$count;
+    $stdDev = standard_deviation($values);
+    $moe = margin_of_error($stdDev,$count);
+    ?>
+    Average: <?php echo $metric->value($average); ?>
+    Standard Deviation: <?php echo $metric->value($stdDev,true); ?>
+    Margin of Error: &plusmn;<?php echo $metric->value($moe,true); ?> (<?php echo $metric->value($average-$moe); ?> to <?php echo $metric->value($average+$moe); ?>)
+</div>
 
 
 <form action="metric.php" method="post" style="display: none;" id="editMetricForm">
