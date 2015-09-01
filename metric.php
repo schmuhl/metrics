@@ -179,7 +179,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 		<?php for ( $i = 0; $i < $max; $i++ ) {
 		     $recording = $metric->recordings[$i];
 		     ?>
-		['<?php echo $metric->toDate($recording->recorded); ?>',  <?php echo $metric->value($recording->value,true); ?> <?php if ( isset($recordings2) ) echo ", ".$metric->value($recordings2[$i]->value); ?>],
+		['<?php echo $metric->toDate($recording->recorded); ?>',  <?php echo $metric->value($recording->value,true); ?> <?php if ( isset($recordings2) ) echo ", ".$metric->value($recordings2[$i]->value,true); ?>],
 		<?php } ?>
 	]);
 
@@ -335,7 +335,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
     $max = isset($recordings2) ? max(count($recordings2),count($metric->recordings)) : count($metric->recordings); // how many data points to show?
     for ( $i = 0; $i < $max; $i++ ) {
         $recording = isset($metric->recordings[$i]) ? $metric->recordings[$i] : null; ?>
-	<tr id="recording<?php echo ++$i; ?>">
+	<tr id="recording<?php echo $i; ?>">
         <?php if ( isset($recording) ) { ?>
 		<td><?php echo date("n/d/Y g:ia",strtotime($recording->recorded)); ?></td>
 		<td align="right" id="recording<?php echo $i; ?>ValueColumn">

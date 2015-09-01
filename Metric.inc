@@ -164,13 +164,20 @@ class Metric {
                 else return $value."%";
             }
         }
-        else if ( isset($this->precision) ) return number_format($value,$this->precision);
+        else if ( isset($this->precision) ) {
+            if ( $justNumber ) return round($value,$this->precision);
+            return number_format($value,$this->precision);
+        }
 		else if ( $this->type == 'decimal' ) {
+            if ( $justNumber ) return round($value,$this->precision);
 		    if ( $value < 0.1 ) return number_format($value,4);
 		    if ( $value < 1 ) return number_format($value,3);
 		    else return number_format($value,2);
 		}
-		else return number_format($value);
+		else {
+            if ( $justNumber ) return $value;
+            else return number_format($value);
+        }
 	}
 	
 	/**
