@@ -1,15 +1,41 @@
 <?php
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
+// read the configuration
+if ( $config = file_get_contents("configuration.json") ) {
+    $config = json_decode($config);
+    // @todo check to make sure all the config is there
+    if ( !isset($config->timezone) ) $config->timezone = 'UTC';
+    if ( !isset($config->database) ) die("Database settings are required.");
+} else {
+    // create a dummy config file
+    $json = new stdClass();
+    $json->timezone = 'UTC';
+    $json->database = new stdClass();
+    $json->database->host = '127.0.0.1';
+    $json->database->database = 'metrics';
+    $json->database->username = 'root';
+    $json->database->password = 'root';
+
+    // attempt to write the configuration file
+    if ( !file_put_contents('configuration.json',json_encode($json)) ) {
+        die('Cannot create configuration file (which is probably good) so you will need to make it yourself or give more access to this directory (scary).');
+    }
+
+    // reload and try again
+    header("Refresh:0");
+    exit();
+}
+
 
 session_start();
 require "../projects/common/database.inc"; /* @todo include these functions into the repo or don't use them */
 require "Metric.inc";
-$mysqli = dbConnect("metrics","127.0.0.1","root","root"); /* @todo Move these settings into a config file */
-date_default_timezone_set("UTC"); // Note that PHP and MySQL must be running on the same time zone!
+
+
+// use the settings that should be there, hopefully
+$mysqli = dbConnect($config->database->database,$config->database->host,$config->database->username,$config->database->password); /* @todo Move these settings into a config file */
+date_default_timezone_set($config->timezone); // Note that PHP and MySQL must be running on the same time zone!
 
 
 /**
