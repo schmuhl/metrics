@@ -29,12 +29,11 @@ if ( $config = file_get_contents("configuration.json") ) {
 
 
 session_start();
-require "../projects/common/database.inc"; /* @todo include these functions into the repo or don't use them */
 require "Metric.inc";
 
 
 // use the settings that should be there, hopefully
-$mysqli = dbConnect($config->database->database,$config->database->host,$config->database->username,$config->database->password); /* @todo Move these settings into a config file */
+$mysqli = dbConnect($config->database->database,$config->database->host,$config->database->username,$config->database->password);
 date_default_timezone_set($config->timezone); // Note that PHP and MySQL must be running on the same time zone!
 
 
@@ -107,5 +106,133 @@ function standard_deviation(array $a, $sample = false) {
         --$n;
     }
     return sqrt($carry / $n);
+}
+
+
+
+
+/**
+ * load this array up if you want to show error messages to the user
+ * @param mixed $message
+ * @return boolean
+ */
+function addMessage ( $message ) {
+    if ( !isset($_SESSION['messages']) ) {  // set the session message variable
+        $_SESSION['messages'] = array();
+    }
+    if ( is_array($message) ) {
+        foreach ( $message as $m ) {
+            if ( !empty($m) ) {
+                $_SESSION['messages'] []= $m;
+            }
+        }
+    } else if ( !empty($message) ) {
+        $_SESSION['messages'] []= $message;
+    } else {
+        return false;
+    }
+    return true;
+}
+
+
+/**
+ * Get the messages
+ * @return array An array of strings
+ */
+function getMessages ( $clear=true ) {
+    // messages to show to the user
+    if ( !isset($_SESSION['messages']) || !is_array($_SESSION['messages']) ) $_SESSION['messages'] = array();
+    $messages = $_SESSION['messages'];
+    $_SESSION['messages'] = array(); // clear it
+    return $messages;
+}
+
+
+
+/**
+ * Make a connection to the database
+ * @global string $MYSQL_USER
+ * @global string $MYSQL_PASSWORD
+ * @param string $database
+ * @return boolean
+ */
+function dbConnect ( $database, $host, $user, $password ) {
+    if ( empty($database) || empty($host) || empty($user) ) return false;
+
+    $mysqli = new mysqli($host,$user,$password,$database);
+    if ($mysqli->connect_errno) {
+        trigger_error("Failed to connect to MySQL database '$database' on host '$host' : (" . $mysqli->connect_errno . " " . $mysqli->connect_error.")");
+        return false;
+    }
+
+    return $mysqli;
+}
+
+
+/**
+ * Wrapper function for queries
+ * @global type $mysqli
+ * @param string $sql
+ * @return type result
+ */
+function dbQuery ( $sql ) {
+    global $mysqli;
+    if ( !$mysqli ) return false;
+    $result = $mysqli->query($sql);
+    if ( !$result && isset($DEVELOPMENT_ENVIRONMENT) && $DEVELOPMENT_ENVIRONMENT ) trigger_error(mysql_error()." on ($sql)");
+    return $result;
+}
+
+function dbFetch ( $results ) {
+    global $mysqli;
+    return $results->fetch_assoc();
+
+}
+
+/**
+ * Wrapper function for knowing how many rows were affected by the last query
+ * @global type $mysqli
+ * @return int
+ */
+function dbRows () {
+    global $mysqli;
+    return $mysqli->affected_rows;
+}
+
+/**
+ * Wrapper function for knowing the ID for a newly inserted row
+ * @global type $mysqli
+ * @return int
+ */
+function dbInsertID () {
+    global $mysqli;
+    return $mysqli->insert_id;
+}
+
+/**
+ * Wrapper function for knowing if there is a database error
+ * @global type $mysqli
+ * @return string
+ */
+function dbError () {
+    global $mysqli;
+    return $mysqli->error;
+}
+
+
+/**
+ * @deprecated
+ */
+function dbSetup () {
+    global $dbHOST;
+    global $dbUSER;
+    global $dbPASSWORD;
+    global $dbNAME;
+
+    mysql_connect($dbHOST,$dbUSER,$dbPASSWORD) or die(mysql_error());
+    mysql_query("DROP DATABASE $dbNAME;") or die(mysql_error());
+    mysql_query("CREATE DATABASE $dbNAME;") or die(mysql_error());
+    mysql_query("USE $dbNAME") or die(mysql_error());
+    addMessage("Database has been created.");
 }
 ?>
