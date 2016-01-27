@@ -20,7 +20,8 @@ $metrics = Metric::getAllMetrics();
       <th>Average</th>
       <th>MOE</th>
 	</tr>
-	<?php foreach ( $metrics as $metric ) { 
+	<?php foreach ( $metrics as $metric ) {
+        if ( empty($metric->name) ) continue;
 		$recording = $metric->getLastRecording();
         $metric->getRecordings(100);
 		$recorded = @strtotime($recording->recorded);
