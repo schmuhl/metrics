@@ -1,0 +1,22 @@
+BODY { margin: 0; padding: 0; font: 12px Helvetica, Arial, sans-serif; background: #444; }
+
+H1 { margin: 5px 0; font-family: Georgia, Times, "Times New Roman", serif; }
+H1 { font-size: 20px; }
+H2 { font-size: 18px; }
+A { text-decoration: none; }
+A:hover { text-decoration: underline; }
+P { margin: 5px 0; }
+DIV#chart_div { width: 900px; height: 400px; }
+
+DIV#body { margin: 0 auto; width: 1200px; background: white; }
+DIV#body FOOTER { padding: 10px; background: #777; }
+DIV#body HEADER { padding: 10px; background: #DDD }
+DIV#body HEADER DIV#title { font-size: 18px; font-weight: bold; }
+
+DIV#body DIV.content { padding: 20px; }
+DIV#body DIV.content DIV#breadcrumb { margin: -15px 0 20px 0; }
+DIV#body DIV.content DIV#chart_div { margin: 20px 0 0 0; width: 1150px; height: 400px; }
+
+
+DIV#metricLegend { float: right; border: 1px solid gray; padding: 5px; background: #eee; }
+DIV#metricLegend FORM { margin: 0 0 5px 0; }

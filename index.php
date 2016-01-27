@@ -9,13 +9,16 @@ require "template.inc";
 
 $metrics = Metric::getAllMetrics();
 //print_r($metrics);
+
+
+showHeader($config->name);
 ?>
 
 <h1>Metrics</h1>
 <table>
 	<tr>
       <th colspan="2">Metric</th>
-      <th>Value</th>
+      <th>Last Value</th>
       <th>Last Recorded</th>
       <th>Average</th>
       <th>MOE</th>
@@ -56,14 +59,20 @@ $metrics = Metric::getAllMetrics();
 	    <td><img src="images/<?php echo $status; ?>.png" alt="<?php echo $statusDescription; ?>" title="<?php echo $statusDescription; ?>" /></td>
 		<td><a href="metric.php?metric=<?php echo $metric->metricID; ?>"><?php echo $metric->name; ?></a></td>
 		<td align="right"><?php if ( $recording instanceOf MetricRecording ) echo $metric->value($recording->value); ?></td>
-       <td><?php if ( $recording instanceOf MetricRecording ) echo $metric->toDate($recording->recorded,true); ?></td>
-       <td><?php if ( $recording instanceOf MetricRecording ) echo $metric->value($average); ?></td>
-       <td><?php if ( $recording instanceOf MetricRecording ) echo '&plusmn;'.$metric->value($moe,true); ?></td>
+       <td align="right"><?php if ( $recording instanceOf MetricRecording ) echo $metric->toDate($recording->recorded,true); ?></td>
+       <td align="right"><?php if ( $recording instanceOf MetricRecording ) echo $metric->value($average); ?></td>
+       <td align="right"><?php if ( $recording instanceOf MetricRecording ) echo '&plusmn;'.$metric->value($moe,true); ?></td>
 	</tr>
 	<?php } ?>
 </table>
 
+
+<?php if ( isset($_SESSION['admin']) ) { ?>
 <p>
     <a href="metric.php?metric=new"><img src="images/add.png" style="margin-right: 5px;"/>New metric...</a>
 </p>
+<?php } ?>
+
+
+<?php showFooter(); ?>
 

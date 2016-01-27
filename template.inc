@@ -10,6 +10,7 @@ if ( $config = file_get_contents("configuration.json") ) {
 } else {
     // create a dummy config file
     $json = new stdClass();
+    $json->name = 'Metrics';
     $json->timezone = 'UTC';
     $json->database = new stdClass();
     $json->database->host = '127.0.0.1';
@@ -43,32 +44,53 @@ date_default_timezone_set($config->timezone); // Note that PHP and MySQL must be
  * @todo Do a better job of displaying the messages in the header
  */
 function showHeader ( $title=null ) {
+    global $config;
     if ( !isset($_SESSION['messages']) || !is_array($_SESSION['messages']) ) $_SESSION['messages'] = array();
     $messages = $_SESSION['messages'];
     ?>
 <!DOCTYPE html>
 <html>
     <head>
-	<title><?php echo $title; ?></title>
-	<script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <title><?php echo $title; ?></title>
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <link href="style.css" rel="stylesheet" />
     </head>
-    <header>
-        <div>
-            <a href="index.php">Home</a>
-        </div>
-        <div id="messages">
-            <?php
-            $messages = getMessages();
-            print_r($messages);
-            ?>
-        </div>
-    </header>
+    <body>
+        <div id="body">
+            <header>
+                <div id="title">
+                    <a href="index.php"><?php echo $config->name; ?></a>
+                </div>
+                <div id="messages">
+                    <?php
+                    $messages = getMessages();
+                    if ( count($messages) > 0 ) {
+                        ?>
+                    <ul id="messages">
+                        <?php foreach ( $messages as $message ) {
+                            ?>
+                        <li><?php echo $message; ?></li>
+                            <?php
+                        }
+                        ?>
+                    </ul>
+                        <?php
+                    }
+                    ?>
+                </div>
+            </header>
+            <div class="content">
     <?php
 }
 
 
 function showFooter () {
     ?>
+            </div>
+            <footer>
+                &nbsp;
+            </footer>
+        </div>
     </body>
 </html>
     <?php

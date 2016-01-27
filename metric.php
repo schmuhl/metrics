@@ -41,6 +41,7 @@ if ( isset($_POST['metricID']) ) {
 if ( isset($_GET['frequency']) && in_array($_GET['frequency'],Metric::$frequencies) ) {
     $frequency = $_GET['frequency'];
 } else $frequency = $metric->frequency;
+$frequency="daily";
 
 
 // what timeframes to look at?
@@ -167,6 +168,12 @@ die();
 if ( $showHeading ) showHeader("Metrics: $metric->name");
 ?>
 
+<?php if ( $showHeading ) { ?>
+<div id="breadcrumb">
+    <a href="index.php"><< all metrics</a>
+</div>
+<?php } ?>
+
 <?php if ( count($metric->recordings) > 0 ) { ?>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
@@ -201,7 +208,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
     
 <?php if ( $showHeading ) { ?>
 
-<div style="float: right;">
+<div id="metricLegend">
     <form action="metric.php">
         From: <input type="text" name="from" value="<?php echo $from; ?>" />
         To: <input type="text" name="to" value="<?php echo $to; ?>" />
@@ -210,30 +217,31 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
         <input type="hidden" name="compare" value="<?php echo $compare; ?>" />
         <input type="hidden" name="frequency" value="<?php echo $frequency; ?>" />
     </form>
-    <br/>
-    Frequency:
+    <!--Frequency:
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=hourly">hourly</a>
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily">daily</a>
-    <br/>
-    Compare to last:
+    <br/>-->
+    (beta) Compare to last:
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-1year">year</a>
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-4months">trimester</a>
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-1month">month</a>
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=-7days">week</a>
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=daily&compare=">NONE</a>
     <br/>
-    Output:
-    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>">HTML</a>
-    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>&show=graph">Graph</a>
+    View as:
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>&show=csv">CSV/Excel</a>
+    <!-- <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>">HTML</a> -->
     <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>&show=json">JSON</a>
-    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>&show=csv">CSV</a>
+    <a href="metric.php?metric=<?php echo $metric->metricID; ?>&frequency=<?php echo $frequency; ?>&show=graph">Chart</a>
 </div>
 
 <h1><?php echo $metric->name; ?></h1>
 <p>
 	<?php echo $metric->description; ?> 
-	(<?php echo ucwords($metric->type); ?>, <?php echo ucwords($metric->frequency); ?>)
+	(Recorded <?php echo ($metric->frequency); ?> as <?php echo ($metric->type); ?>)
+    <?php if ( isset($_SESSION['admin']) ) { ?>
 	<img src="images/metricEdit.png" alt="Edit metric" title="Edit metric" onclick="$('#editMetricForm').show()" style="cursor: pointer;" />
+    <?php } ?>
 </p>
 <div class="stats">
     <?php
@@ -252,7 +260,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
     ?>
     Average: <?php echo $metric->value($average); ?>
     Standard Deviation: <?php echo $metric->value($stdDev,true); ?>
-    Margin of Error: &plusmn;<?php echo $metric->value($moe,true); ?> (<?php echo $metric->value($average-$moe); ?> to <?php echo $metric->value($average+$moe); ?>)
+    Margin of Error: &plusmn;<?php echo $metric->value($moe,true); ?> or <?php echo $metric->value($average-$moe); ?> to <?php echo $metric->value($average+$moe); ?>
 </div>
 
 
@@ -314,20 +322,20 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 
 
 <?php if ( count($metric->recordings) > 0 ) { ?>
-<div id="chart_div" style="width: 900px; height: 400px;"></div>
+<div id="chart_div" style=""></div>
 <?php } ?>
 
 
 <?php if ( $showRecordings ) { ?>
-<h2>Recordings</h2>
+<h2>Data</h2>
 <table>
 	<tr>
 		<th>Recorded</th>
 		<th>Value</th>
         <?php if ( isset($recordings2) ) { ?>
         <td> &nbsp; </td>
-        <th>Recorded</th>
         <th>Comparison</th>
+        <th>Value</th>
         <?php } ?>
 	</tr>
 	<?php 
@@ -340,7 +348,9 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 		<td><?php echo date("n/d/Y g:ia",strtotime($recording->recorded)); ?></td>
 		<td align="right" id="recording<?php echo $i; ?>ValueColumn">
 			<span id="recording<?php echo $i; ?>Value"><?php echo $metric->value($recording->value); ?></span>
+            <?php if ( isset($_SESSION['admin']) ) { ?>
 			<img src="images/recordingEdit.png" alt="Edit recording" title="Edit recording" style="cursor: pointer;" onclick="$('#recording<?php echo $i; ?>Editable').show(); $('#recording<?php echo $i; ?>ValueColumn').hide();" />
+            <?php } ?>
 		</td>
 		<td id="recording<?php echo $i; ?>Editable" style="display: none;">
 			<input id="recording<?php echo $i; ?>NewValue" type="text" value="<?php echo $metric->value($recording->value); ?>" />
