@@ -322,6 +322,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 
 
 <?php if ( count($metric->recordings) > 0 ) { ?>
+<style>#chart_div { margin: 30px auto 0 auto; width: 1000px; height: 400px; }</style>
 <div id="chart_div" style=""></div>
 <?php } ?>
 
