@@ -163,6 +163,10 @@ die();
 */
 
 
+// the width and height may be specified for the chart, grab it
+$chartWidth = ( isset($_GET['width']) ) ? $_GET['width'] : 1000;
+$chartHeight = ( isset($_GET['height']) ) ? $_GET['height'] : 400;
+
 
 
 if ( $showHeading ) showHeader("Metrics: $metric->name");
@@ -192,6 +196,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 
 	var options = {
 		title: '<?php echo $metric->name; ?>',
+        <?php if ( !isset($recordings2) ) { ?>'legend':'none',<?php } ?>
 		animation: {
 			duration: 1000,
 			easing: 'out'
@@ -322,7 +327,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 
 
 <?php if ( count($metric->recordings) > 0 ) { ?>
-<style>#chart_div { margin: 30px auto 0 auto; width: 1000px; height: 400px; }</style>
+<style>#chart_div { margin: 30px auto 0 auto; width: <?php echo $width; ?>px; height: <?php echo $height; ?>px; }</style>
 <div id="chart_div" style=""></div>
 <?php } ?>
 
