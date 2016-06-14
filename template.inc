@@ -1,7 +1,11 @@
 <?php
 
 session_start();
-if ( !isset($_SESSION['admin']) ) $_SESSION['admin'] = true;
+
+// are you an admin?
+if ( isset($_GET['admin']) ) $_SESSION['admin'] = true;
+if ( !isset($_SESSION['admin']) ) $_SESSION['admin'] = false;
+
 
 
 // read the configuration
