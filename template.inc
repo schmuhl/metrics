@@ -6,6 +6,7 @@ if ( $config = file_get_contents("configuration.json") ) {
     $config = json_decode($config);
     // @todo check to make sure all the config is there
     if ( !isset($config->timezone) ) $config->timezone = 'UTC';
+    if ( !isset($config->errors) ) $config->errors = false;
     if ( !isset($config->database) ) die("Database settings are required.");
 } else {
     // create a dummy config file
@@ -28,6 +29,8 @@ if ( $config = file_get_contents("configuration.json") ) {
     exit();
 }
 
+// show errors?
+if ( $config->errors ) error_reporting(-1); else error_reporting(0);
 
 session_start();
 require "Metric.inc";
