@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 
 // read the configuration
 if ( $config = file_get_contents("configuration.json") ) {
@@ -32,7 +34,6 @@ if ( $config = file_get_contents("configuration.json") ) {
 // show errors?
 if ( $config->errors ) error_reporting(-1); else error_reporting(0);
 
-session_start();
 require "Metric.inc";
 
 

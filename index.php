@@ -5,7 +5,7 @@
  */
 
 
-require "template.inc";
+require 'template.inc';
 
 $metrics = Metric::getAllMetrics();
 //print_r($metrics);
@@ -67,7 +67,7 @@ showHeader($config->name);
 </table>
 
 
-<?php if ( isset($_SESSION['admin']) ) { ?>
+<?php if ( $_SESSION['admin'] ) { ?>
 <p>
     <a href="metric.php?metric=new"><img src="images/add.png" style="margin-right: 5px;"/>New metric...</a>
 </p>

@@ -244,7 +244,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 <p>
 	<?php echo $metric->description; ?> 
 	(Recorded <?php echo ($metric->frequency); ?> as <?php echo ($metric->type); ?>)
-    <?php if ( isset($_SESSION['admin']) ) { ?>
+    <?php if ($_SESSION['admin']) { ?>
 	<img src="images/metricEdit.png" alt="Edit metric" title="Edit metric" onclick="$('#editMetricForm').show()" style="cursor: pointer;" />
     <?php } ?>
 </p>
@@ -354,7 +354,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 		<td><?php echo date("n/d/Y g:ia",strtotime($recording->recorded)); ?></td>
 		<td align="right" id="recording<?php echo $i; ?>ValueColumn">
 			<span id="recording<?php echo $i; ?>Value"><?php echo $metric->value($recording->value); ?></span>
-            <?php if ( isset($_SESSION['admin']) ) { ?>
+            <?php if ($_SESSION['admin']) { ?>
 			<img src="images/recordingEdit.png" alt="Edit recording" title="Edit recording" style="cursor: pointer;" onclick="$('#recording<?php echo $i; ?>Editable').show(); $('#recording<?php echo $i; ?>ValueColumn').hide();" />
             <?php } ?>
 		</td>
