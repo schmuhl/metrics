@@ -31,7 +31,7 @@ if ( count($r2) == 0 ) {  // what? nothing in this year?
 } else {  // this is the expected case
     $value = number_format($r2[count($r2)-1]->value);
     $caption = date("F jS",strtotime($r2[count($r2)-1]->recorded));
-}
+} 
 
 
 
