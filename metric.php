@@ -1,8 +1,4 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 
 require "template.inc";
@@ -210,7 +206,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 	}
 </script>
 <?php } ?>
-    
+
 <?php if ( $showHeading ) { ?>
 
 <div id="metricLegend">
@@ -242,7 +238,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 
 <h1><?php echo $metric->name; ?></h1>
 <p>
-	<?php echo $metric->description; ?> 
+	<?php echo $metric->description; ?>
 	(Recorded <?php echo ($metric->frequency); ?> as <?php echo ($metric->type); ?>)
     <?php if ($_SESSION['admin']) { ?>
 	<img src="images/metricEdit.png" alt="Edit metric" title="Edit metric" onclick="$('#editMetricForm').show()" style="cursor: pointer;" />
@@ -314,7 +310,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 		});
 		return true;
 	}
-	
+
 	function deleteRecording  ( metricID, recorded, value ) {
 		$.getJSON('record.php?action=delete&metric='+metricID+"&date="+recorded+"&value="+value, function(data) {
 			//alert(data.message);
@@ -344,7 +340,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
         <th>Value</th>
         <?php } ?>
 	</tr>
-	<?php 
+	<?php
 	$i = 0;
     $max = isset($recordings2) ? max(count($recordings2),count($metric->recordings)) : count($metric->recordings); // how many data points to show?
     for ( $i = 0; $i < $max; $i++ ) {
