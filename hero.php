@@ -68,7 +68,7 @@ if ( $showHeading ) showHeader($metric->name);
   google.setOnLoadCallback(drawChart);
   function drawChart() {
   var data = google.visualization.arrayToDataTable([
-    ['Date', 'Value' <?php if ( isset($recordings2) ) echo ", 'Comparison'"; ?> ],
+    ['Date', 'This Year' <?php if ( isset($r2) ) echo ", 'Last Year'"; ?> ],
         <?php $max = isset($r2) ? max(count($r2),count($r1)) : count($r1); // how many data points to show ?>
     <?php for ( $i = 0; $i < $max; $i++ ) { ?>
     ['<?php echo date("j-M",strtotime($r1[$i]->recorded)); ?>',  <?php echo $metric->value($r1[$i]->value,true); ?> <?php if ( isset($r2) ) echo ", ".$metric->value($r2[$i]->value,true); ?>],
