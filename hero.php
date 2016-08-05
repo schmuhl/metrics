@@ -19,10 +19,12 @@ $metric->getRecordings(null,'daily',"2015-07-01","now");
 // get this year's and the last year comparison
 $r1 = array();
 $r2 = array();
+$runningTotal = 0;
 foreach ( $metric->recordings as $recording ) {
   $date = date("Y-m",strtotime($recording->recorded));
   if ( $recording->recorded >= '2015-07-15' && $recording->recorded < '2016-01-01' ) $r1[]= $recording;
   else if ( $recording->recorded >= '2016-07-15' ) $r2[]= $recording;
+  if ( $recording->recorded >= '2016-08-01' ) $runningTotal += $recording->value;
 }
 if ( count($r2) == 0 ) {  // what? nothing in this year?
     $value = number_format($r1[count($r1)-1]->value);
@@ -31,8 +33,8 @@ if ( count($r2) == 0 ) {  // what? nothing in this year?
 } else {  // this is the expected case
     $value = number_format($r2[count($r2)-1]->value);
     $caption = date("F jS",strtotime($r2[count($r2)-1]->recorded));
-} 
-
+}
+$runningTotal = number_format($runningTotal);
 
 
 
@@ -50,7 +52,8 @@ if ( $showHeading ) showHeader($metric->name);
   DIV.hero DIV.today { float: left; margin: 50px 0; border: 1px solid gray; width: 460px; height: 400px; text-align: center; }
   DIV.hero DIV.today DIV.value { height: 300px; font-size: 170px; line-height: 300px; }
   DIV.hero DIV.today DIV.caption { hight: 100px; background: gray; color: white; font-size: 60px; line-height: 100px; }
-  DIV.hero DIV#chart_div { float: right; margin: -10px 0 0 0 !important; padding: 0 !important; width: 800px !important; height: 600px !important; over1flow: hidden; }
+  DIV.hero DIV#chart_div { float: right; margin: -10px 0 0 0 !important; padding: 0 !important; width: 800px !important; height: 500px !important; over1flow: hidden; }
+  DIV.hero DIV.total { clear: both; margin: 0 auto 10px auto; width: 80%; color: white; border: 2px solid red; background: #ff9999; font-size: 60px; line-height: 80px; text-align: center; border-radius: 35px; }
 </style>
 
 
@@ -64,6 +67,8 @@ if ( $showHeading ) showHeader($metric->name);
   </div>
 
   <div id="chart_div"></div>
+
+  <div class="total"><?php echo $runningTotal; ?> and counting</div>
 
 </div>
 
