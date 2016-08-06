@@ -47,13 +47,13 @@ if ( $showHeading ) showHeader($metric->name);
   DIV#body HEADER { width: auto; }
   DIV#body DIV.content { width: 100%; }
 
-  DIV.hero { width: 100%; display: block; overflow: hidden; }
+  DIV.hero { margin: 0 -20px; padding: 0; width: 100%; display: block; overflow: hidden; }
   DIV.hero H1 { margin: 0 0 20px 0; padding: 0; font-size: 80px; text-align: center; line-height: 120px; }
-  DIV.hero DIV.today { float: left; margin: 50px 0; border: 1px solid gray; width: 460px; height: 400px; text-align: center; }
+  DIV.hero DIV.today { float: left; margin: 50px 0 0 20px; border: 1px solid gray; width: 460px; height: 400px; text-align: center; }
   DIV.hero DIV.today DIV.value { height: 300px; font-size: 170px; line-height: 300px; }
   DIV.hero DIV.today DIV.caption { hight: 100px; background: gray; color: white; font-size: 60px; line-height: 100px; }
   DIV.hero DIV#chart_div { float: right; margin: -10px 0 0 0 !important; padding: 0 !important; width: 800px !important; height: 500px !important; over1flow: hidden; }
-  DIV.hero DIV.total { clear: both; margin: 0 auto 10px auto; width: 80%; color: white; border: 2px solid red; background: #ff9999; font-size: 60px; line-height: 80px; text-align: center; border-radius: 35px; }
+  DIV.hero DIV.total { clear: both; margin: 0 0 15px 0; color: #dc3912; border: 0px solid #dc3912; background: #f5c4b8; font-size: 60px; line-height: 90px; text-align: center;  }
 </style>
 
 
