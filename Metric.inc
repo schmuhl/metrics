@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * The Metric object
  * @copyright Ben Schmuhl
  * @since
@@ -11,25 +11,25 @@ require 'MetricRecording.inc';
 
 
 class Metric {
-	
+
 	var $metricID;
 	var $name;
 	var $description;
 	var $type;
 	var $frequency;
 	var $allowZero;
-	
+
 	var $recordings;
 
-    var $precision = 3;
+  var $precision = 3;
 	static $types = array('decimal','integer','percentage');
 	static $frequencies = array('monthly','daily','hourly','minutely');
-	
-	
+
+
 	/**
 	 * Create a metric
 	 * @param type $metricID
-	 * @return type 
+	 * @return type
 	 */
 	public function __construct ( $metricID=null ) {
 		$this->recordings = array();
@@ -39,8 +39,8 @@ class Metric {
 		$row = dbFetch($result);
 		$this->setByArray($row);
 	}
-	
-	
+
+
 	/** Set the members of this object by an array
 	 *@param array info the array to set from (like a mysql_fetch_array or _POST)
 	 */
@@ -51,11 +51,11 @@ class Metric {
 		    else if ( isset($info[$var]) ) $this->$var = $info[$var];
 		}
 	}
-	
-	
+
+
 	/**
 	 * Save a new Metric, or update a new one
-	 * @return boolean 
+	 * @return boolean
 	 */
 	public function save () {
 		$name = addslashes($this->name);
@@ -71,15 +71,15 @@ class Metric {
 		if ( !$result ) return false;
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Get the recordings for this given metric
      * @param int $count The number or results to return, or null for all
      * @param string $frequency The frequency to report on, or null for default
      * @param string $from The date of recordings to start at (mutually exclusive with $count)
      * @param string $to The date of recordings to stop at
-	 * @return array An array of MetricRecording objects 
+	 * @return array An array of MetricRecording objects
 	 */
 	public function getRecordings ( $count=null, $frequency=null, $from=null, $to=null ) {
         if ( isset($frequency) && !in_array($frequency,Metric::$frequencies) ) return null;  // illegal frequency
@@ -88,10 +88,10 @@ class Metric {
 		usort($this->recordings,"MetricRecording::sortByDate");
 		return $this->recordings;
 	}
-	
-	
+
+
 	/**
-	 * Just grab the most recent recording 
+	 * Just grab the most recent recording
 	 */
 	public function getLastRecording () {
 		if ( count($this->recordings) < 1 ) $this->getRecordings();
@@ -99,12 +99,12 @@ class Metric {
 		if ( isset($this->recordings[count($this->recordings)-1]) ) return $this->recordings[count($this->recordings)-1];
 		else return null;
 	}
-	
-	
+
+
 	/**
 	 * Make a new recording
 	 * @param mixed $date
-	 * @param float $value 
+	 * @param float $value
 	 */
 	public function saveRecording ( $date, $value ) {
 		$recording = new MetricRecording();
@@ -116,13 +116,13 @@ class Metric {
 		if ( $recording->save($this->frequency) ) $this->recordings []= $recording;
 		return $recording;
 	}
-	
-	
+
+
 	/**
 	 * Delete a single recording with the spencifed data
 	 * @param mixed $date
 	 * @param float $value
-	 * @return boolean success 
+	 * @return boolean success
 	 */
 	public function deleteRecording ( $date, $value ) {
 		$recording = new MetricRecording();
@@ -131,12 +131,12 @@ class Metric {
 		$recording->value = $value;
 		return $recording->delete();
 	}
-	
-	
+
+
 	/**
 	 * Format the date in a way that will make sense, given this metric's frequency
 	 * @param mixed $date
-	 * @return string 
+	 * @return string
 	 */
 	public function toDate ( $date, $showFullAnyway=false ) {
 		if ( !is_numeric($date) ) $date = strtotime($date);
@@ -144,32 +144,34 @@ class Metric {
 		if ( !$showFullAnyway && $this->frequency == 'hourly' ) return date("n/d ga",$date);
 		else return date("n/d/Y g:ia",$date);
 	}
-	
-	
-	/** 
+
+
+	/**
 	 * Show the value, given the type of metric
 	 * @param float $value
-     * @param boolean $justNumber Specify whether or not to return just the number or to return commas and %, $ as well
-	 * @return string 
+	 * @param boolean $justNumber Specify whether or not to return just the number or to return commas and %, $ as well
+	 * @param int $precision Override the number of decimal points to use?
+	 * @return string
 	 */
-	public function value ( $value=null, $justNumber=false ) {
-        if ( !isset($value) ) $value = $this->value;
-        if ( $this->type == 'integer' ) return round($value);
+	public function value ( $value=null, $justNumber=false, $precision=null ) {
+		$precision = isset($precision) ? $precision : isset($this->precision) ? $this->precision : null;
+    if ( !isset($value) ) $value = $this->value;
+    if ( $this->type == 'integer' ) return round($value);
 		if ( $this->type == 'percentage' ) {
-            if ( isset($this->precision) ) {
-                if ( $justNumber ) return number_format($value,$this->precision);
-                else return number_format($value,$this->precision).'%';
+            if ( isset($precision) ) {
+                if ( $justNumber ) return number_format($value,$precision);
+                else return number_format($value,$precision).'%';
             } else {
                 if ( $justNumber ) return $value;
                 else return $value."%";
             }
         }
-        else if ( isset($this->precision) ) {
-            if ( $justNumber ) return round($value,$this->precision);
-            return number_format($value,$this->precision);
+        else if ( isset($precision) ) {
+            if ( $justNumber ) return round($value,$precision);
+            return number_format($value,$precision);
         }
 		else if ( $this->type == 'decimal' ) {
-            if ( $justNumber ) return round($value,$this->precision);
+            if ( $justNumber ) return round($value,$precision);
 		    if ( $value < 0.1 ) return number_format($value,4);
 		    if ( $value < 1 ) return number_format($value,3);
 		    else return number_format($value,2);
@@ -179,7 +181,7 @@ class Metric {
             else return number_format($value);
         }
 	}
-	
+
 	/**
 	 * Get all of the metrics
 	 * @return array An array of Metric objects
@@ -198,20 +200,20 @@ class Metric {
 		}
 		return $metrics;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Create the needed table
 	 * @param boolean $dropFirst Drop the table (reset) before trying to create
-	 * @return boolean 
+	 * @return boolean
 	 */
 	public static function createTable ( $dropFirst = false ) {
 		if ( $dropFirst ) {
 			dbQuery("DROP TABLE metrics;");// or die(mysql_error());
 			dbQuery("DROP TABLE metricRecordings;");// or die(mysql_error());
 		}
-		$sql = "CREATE TABLE IF NOT EXISTS metrics ( 
+		$sql = "CREATE TABLE IF NOT EXISTS metrics (
 			metricID INT PRIMARY KEY AUTO_INCREMENT,
 			name VARCHAR(50),
 			description VARCHAR(255),
@@ -223,7 +225,7 @@ class Metric {
 		foreach ( Metric::$frequencies as $frequency ) $sql .= "'$frequency',";
 		$sql .= "'other') );";
 		$result = dbQuery($sql);// or die(mysql_error());
-		$sql = "CREATE TABLE IF NOT EXISTS metricRecordings ( 
+		$sql = "CREATE TABLE IF NOT EXISTS metricRecordings (
 			metricID INT,
 			recorded DATETIME,
 			value FLOAT

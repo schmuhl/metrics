@@ -21,10 +21,12 @@ $r1 = array();
 $r2 = array();
 $runningTotal = 0;
 foreach ( $metric->recordings as $recording ) {
-  $date = date("Y-m",strtotime($recording->recorded));
-  if ( $recording->recorded >= '2015-07-15' && $recording->recorded < '2016-01-01' ) $r1[]= $recording;
-  else if ( $recording->recorded >= '2016-07-15' ) $r2[]= $recording;
-  if ( $recording->recorded >= '2016-08-01' ) $runningTotal += $recording->value;
+  $date = date("Y-m",strtotime($recording->recorded));  
+  if ( $recording->recorded >= '2015-08-01' && $recording->recorded < '2016-01-01' ) $r1[]= $recording;
+  else if ( $recording->recorded >= '2016-08-01' ) {
+      $r2[]= $recording;
+      $runningTotal += $recording->value;
+  }
 }
 if ( count($r2) == 0 ) {  // what? nothing in this year?
     $value = number_format($r1[count($r1)-1]->value);
