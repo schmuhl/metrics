@@ -33,8 +33,8 @@ if ( count($r2) == 0 ) {  // what? nothing in this year?
   $caption = date("F jS",strtotime($r1[count($r1)-1]->recorded));
   unset($r2);
 } else {  // this is the expected case
-  $value = number_format($r2[count($r2)]->value);
-  $caption = date("F jS",strtotime($r2[count($r2)]->recorded));
+  $value = number_format($r2[count($r2)-1]->value);
+  $caption = date("F jS",strtotime($r2[count($r2)-1]->recorded));
 }
 $runningTotal = number_format($runningTotal);
 
