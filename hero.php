@@ -49,7 +49,7 @@ if ( $showHeading ) showHeader($metric->name);
   DIV#body HEADER { width: auto; }
   DIV#body DIV.content { margin: 0; padding: 0; width: auto; }
 
-  DIV.hero { margin: 0 auto; width: 1900px; height: 900px; padding: 0 0 20px 0; background: white; display: block; overflow: scroll; }
+  DIV.hero { margin: 0 auto; width: 1900px; height: auto; padding: 0 0 20px 0; background: white; display: block; overflow: hidden; }
   DIV.hero H1 { margin: 20px 0 50px 0; padding: 0; font-size: 90px; text-align: center; line-height: 120px; }
   DIV.hero DIV.today { float: left; margin: 50px 0 0 20px; border: 2px solid black; width: 600px; height: 350px; text-align: center; overflow: hidden; }
   DIV.hero DIV.today DIV.value { height: 250px; font-size: 170px; line-height: 250px; }
