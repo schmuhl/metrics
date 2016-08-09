@@ -21,7 +21,7 @@ $r1 = array();
 $r2 = array();
 $runningTotal = 0;
 foreach ( $metric->recordings as $recording ) {
-  $date = date("Y-m",strtotime($recording->recorded));  
+  $date = date("Y-m",strtotime($recording->recorded));
   if ( $recording->recorded >= '2015-08-01' && $recording->recorded < '2016-01-01' ) $r1[]= $recording;
   else if ( $recording->recorded >= '2016-08-01' ) {
       $r2[]= $recording;
@@ -45,17 +45,17 @@ if ( $showHeading ) showHeader($metric->name);
 
 
 <style>
-  DIV#body { width: 100%; height: 100%; }
+  DIV#body { width: auto; background: white; }
   DIV#body HEADER { width: auto; }
-  DIV#body DIV.content { width: 100%; }
+  DIV#body DIV.content { margin: 0; padding: 0; width: auto; }
 
-  DIV.hero { margin: 0 -20px; padding: 0; width: 100%; display: block; overflow: hidden; }
-  DIV.hero H1 { margin: 0 0 20px 0; padding: 0; font-size: 80px; text-align: center; line-height: 120px; }
-  DIV.hero DIV.today { float: left; margin: 50px 0 0 20px; border: 1px solid gray; width: 460px; height: 400px; text-align: center; }
-  DIV.hero DIV.today DIV.value { height: 300px; font-size: 170px; line-height: 300px; }
+  DIV.hero { margin: 0 auto; width: 1900px; height: 900px; padding: 0 0 20px 0; background: white; display: block; overflow: scroll; }
+  DIV.hero H1 { margin: 20px 0 50px 0; padding: 0; font-size: 90px; text-align: center; line-height: 120px; }
+  DIV.hero DIV.today { float: left; margin: 50px 0 0 20px; border: 2px solid black; width: 600px; height: 350px; text-align: center; overflow: hidden; }
+  DIV.hero DIV.today DIV.value { height: 250px; font-size: 170px; line-height: 250px; }
   DIV.hero DIV.today DIV.caption { hight: 100px; background: gray; color: white; font-size: 60px; line-height: 100px; }
-  DIV.hero DIV#chart_div { float: right; margin: -10px 0 0 0 !important; padding: 0 !important; width: 800px !important; height: 500px !important; over1flow: hidden; }
-  DIV.hero DIV.total { clear: both; margin: 0 0 15px 0; color: #dc3912; border: 0px solid #dc3912; background: #f5c4b8; font-size: 60px; line-height: 90px; text-align: center;  }
+  DIV.hero DIV#chart_div { float: right; margin: -50px 0 50px 0 !important; border: none; padding: 0 !important; width: 1200px !important; height: 600px !important; overflow: hidden; }
+  DIV.hero DIV.total { clear: both; float: none; display: block; margin: 15px 0 40px 0; color: #dc3912; border: 0px solid #dc3912; background: #f5c4b8; font-size: 60px; line-height: 100px; text-align: center;  }
 </style>
 
 
@@ -71,7 +71,6 @@ if ( $showHeading ) showHeader($metric->name);
   <div id="chart_div"></div>
 
   <div class="total"><?php echo $runningTotal; ?> and counting</div>
-
 </div>
 
 
@@ -92,7 +91,8 @@ if ( $showHeading ) showHeader($metric->name);
   var options = {
     title: '<?php echo $metric->name; ?>',
     <?php if ( !isset($r2) ) { ?>'legend':'none',<?php } ?>
-    height: 500,
+    height: 630,
+    width: 1200,
     animation: {
       duration: 1000,
       easing: 'out'
