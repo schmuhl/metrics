@@ -105,4 +105,7 @@ if ( $showHeading ) showHeader($metric->name);
 </script>
 
 
+<script>setTimeout(function(){ location.reload(); },3600000)</script>
+
+
 <?php if ( $showHeading ) showFooter(); ?>
