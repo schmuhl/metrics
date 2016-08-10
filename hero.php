@@ -14,7 +14,7 @@ require 'metric-functions.inc';
 //print_r($metric);
 
 // Grab since the last Fall semester
-$metric->getRecordings(null,'daily',"2015-07-01","now");
+$metric->getRecordings(null,'daily',"2015-08-01","tomorrow");
 
 // get this year's and the last year comparison
 $r1 = array();
