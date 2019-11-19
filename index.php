@@ -1,14 +1,16 @@
 <?php
-/* 
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 
 
 require 'template.inc';
-
 $metrics = Metric::getAllMetrics();
 //print_r($metrics);
+$lastMonth = date('Y-m',strtotime('last month'));
+$thisMonth = date('Y-m');
+
 
 
 showHeader($config->name);
@@ -22,11 +24,13 @@ showHeader($config->name);
       <th>Last Recorded</th>
       <th>Average</th>
       <th>MOE</th>
+			<th><?php echo $lastMonth; ?></th>
+			<th><?php echo $thisMonth; ?></th>
 	</tr>
 	<?php foreach ( $metrics as $metric ) {
-        if ( empty($metric->name) ) continue;
+    if ( empty($metric->name) ) continue;
 		$recording = $metric->getLastRecording();
-        $metric->getRecordings(100);
+        $metric->getRecordings(1000);
 		$recorded = @strtotime($recording->recorded);
 		if ( $recorded > time()-(60*60*23) ) {
 		    $status = "current";
@@ -46,22 +50,29 @@ showHeader($config->name);
        $total = 0;
        $count = 0;
        $values = array();
+			 $lastMonths = array();
+			 $thisMonths = array();
        foreach ( $metric->recordings as $recording ) {
           $total += $recording->value;
           $count ++;
           $values []= $recording->value;
+					if ( date('Y-m',strtotime($recording->recorded)) == $lastMonth ) $lastMonths []= $recording->value;
+					if ( date('Y-m',strtotime($recording->recorded)) == $thisMonth ) $thisMonths []= $recording->value;
        }
-       $average = $total/$count;
+			 //print_r($thisMonths); die();
+       $average = ($count==0) ? 0 : $total/$count;
        $stdDev = standard_deviation($values);
        $moe = margin_of_error($stdDev,$count);
 		?>
 	<tr>
 	    <td><img src="images/<?php echo $status; ?>.png" alt="<?php echo $statusDescription; ?>" title="<?php echo $statusDescription; ?>" /></td>
-		<td><a href="metric.php?metric=<?php echo $metric->metricID; ?>"><?php echo $metric->name; ?></a></td>
-		<td align="right"><?php if ( $recording instanceOf MetricRecording ) echo $metric->value($recording->value); ?></td>
+			<td><a href="metric.php?metric=<?php echo $metric->metricID; ?>"><?php echo $metric->name; ?></a></td>
+			<td align="right"><?php if ( $recording instanceOf MetricRecording ) echo $metric->value($recording->value); ?></td>
        <td align="right"><?php if ( $recording instanceOf MetricRecording ) echo $metric->toDate($recording->recorded,true); ?></td>
        <td align="right"><?php if ( $recording instanceOf MetricRecording ) echo $metric->value($average); ?></td>
        <td align="right"><?php if ( $recording instanceOf MetricRecording ) echo '&plusmn;'.$metric->value($moe,true); ?></td>
+			 <td align="right"><?php echo @$metric->value(array_sum($lastMonths)/count($lastMonths)); ?></td>
+			 <td align="right"><?php echo @$metric->value(array_sum($thisMonths)/count($thisMonths)); ?></td>
 	</tr>
 	<?php } ?>
 </table>
@@ -75,4 +86,3 @@ showHeader($config->name);
 
 
 <?php showFooter(); ?>
-

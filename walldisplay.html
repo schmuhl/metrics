@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <title>Wall Display</title>
+    <META HTTP-EQUIV="refresh" CONTENT="3600">
+    <script>
+
+      // CONFIGURATION
+      var urls = [
+        "http://192.168.1.222/metrics/hero.php?metric=1",
+        "http://192.168.1.222/metrics/hero.php?metric=2",
+        "http://192.168.1.222/metrics/hero.php?metric=7",
+        "https://goreact.atlassian.net/secure/Dashboard.jspa?selectPageId=10200",
+        "https://goreact.atlassian.net/secure/RapidBoard.jspa?rapidView=1&quickFilter=113",
+        "https://goreact.atlassian.net/secure/Dashboard.jspa?selectPageId=10202#Created-vs.-Resolved-Chart/10222",
+        "http://192.168.1.222/weather/skins/default/index.html",
+        "https://jenkins.goreact.com/view/GoReact%20Deploy%20Jobs/"
+      ];
+      var speed = 15000; //15000;  // 15 seconds
+      // CONFIGURATION ^^^^^^
+
+    </script>
+    <script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
+    <style>
+      BODY { margin: 0; padding: 0; }
+      IFRAME { position: absolute; top: 0; left: 0; margin: 0; border: 0; width: 100%; height: 100%; z-index: 1; }
+    </style>
+  </head>
+  <body>
+
+    <iframe id="iframe1" src=""></iframe>
+    <iframe id="iframe2" src="" style="display: none;"></iframe>
+
+    <script>
+      // stupid hack for pi chromium browser
+
+      $("BODY").html('<h1>Load these pages by clicking on them:</h1><ol id="list"></ol>');
+      for ( var i=0; i<urls.length-1; i++ ) {
+        $("#list").append('<li><a target="_blank" href="'+urls[i]+'">'+urls[i]+'</a></li>');
+      }
+      exit();
+
+
+      // nice fading between screens
+      var i = 0;
+      iframe1.src = urls[i++];
+      iframe2.src = urls[i];
+      setInterval(function(){
+        if ( i >= urls.length ) i = 0; // loop
+        if ( iframe1.style.display == "" ) {
+          iframe2.style.zIndex = 2;  // put new on top
+          iframe1.style.zIndex = 1;
+          $("#iframe2").fadeIn("slow",function() {  // fade it in
+              iframe2.style.display = "";
+              iframe1.style.display = "none";  // hide the old
+              iframe1.src = urls[i++];  // and have it load the next page
+          });
+        } else {
+          iframe1.style.zIndex = 2;  // put new on top
+          iframe2.style.zIndex = 1;
+          $("#iframe1").fadeIn("slow",function() {  // fade it in
+            iframe1.style.display = "";
+            iframe2.style.display = "none";  // hide the old
+            iframe2.src = urls[i++];  // and have it load the next page
+          });
+        }
+      }, speed);
+    </script>
+  </body>
+</html>

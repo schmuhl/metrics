@@ -119,7 +119,7 @@ if ( isset($compare) ) {
     if ( $from2 != $from && $to2 != $to ) $recordings2 = $metric->getRecordings(null,$frequency,$from2,$to2);  // get the comparison date range
     $metric->getRecordings(null,$frequency,$from,$to);  // get the date range
 
-    if ( count($metric->recordings) < count($recordings2) ) {  // more data points in the comparison, swap them
+    if ( isset($recordings2) && count($metric->recordings) < count($recordings2) ) {  // more data points in the comparison, swap them
         $temp = $metric->recordings;
         $metric->recordings = $recordings2;
         $recordings2 = $temp;
@@ -128,6 +128,8 @@ if ( isset($compare) ) {
 } else {
     $count = ( isset($from) && isset($to) ) ? null : 50;  // default to 50
     $metric->getRecordings(50,$frequency,$from,$to);
+		//print_r($metric->recordings);
+		//die('poo');
 }
 //print_r($metric);
 
@@ -186,7 +188,16 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 		<?php for ( $i = 0; $i < $max; $i++ ) {
 		     $recording = $metric->recordings[$i];
 		     ?>
-		['<?php echo $metric->toDate($recording->recorded); ?>',  <?php echo $metric->value($recording->value,true); ?> <?php if ( isset($recordings2) ) echo ", ".$metric->value($recordings2[$i]->value,true); ?>],
+		['<?php echo $metric->toDate($recording->recorded); ?>',  <?php echo $metric->value($recording->value,true); ?> <?php
+			if ( isset($recordings2) ) {
+				echo ", ";
+				if ( isset($recordings2[$i]) ) {
+					echo $metric->value($recordings2[$i]->value,true);
+				} else {
+					echo '0';
+				}
+			}
+			?>],
 		<?php } ?>
 	]);
 
@@ -255,7 +266,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
         $count ++;
         $values []= $recording->value;
     }
-    $average = $total/$count;
+    $average = ($count>0)?$total/$count:null;
     $stdDev = standard_deviation($values);
     $moe = margin_of_error($stdDev,$count);
     ?>
@@ -263,6 +274,7 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
     Standard Deviation: <?php echo $metric->value($stdDev,true); ?>
     Margin of Error: &plusmn;<?php echo $metric->value($moe,true); ?> or <?php echo $metric->value($average-$moe); ?> to <?php echo $metric->value($average+$moe); ?>
 </div>
+<div><a href="hero.php?metric=<?php echo $metric->metricID; ?>">Wallboard view</a></div>
 
 
 <form action="metric.php" method="post" style="display: none;" id="editMetricForm">

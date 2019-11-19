@@ -12,9 +12,9 @@ class MetricRecording {
 	var $recorded;
 	var $value;
 	var $metricID;
-	
-	
-	
+
+
+
 	/** Set the members of this object by an array
 	 *@param array info the array to set from (like a mysql_fetch_array or _POST)
 	 */
@@ -24,11 +24,11 @@ class MetricRecording {
 			if ( isset($info[$var]) ) $this->$var = $info[$var];
 		}
 	}
-	
-	
+
+
 	/**
 	 * Save a new metric recording
-	 * @return boolean 
+	 * @return boolean
 	 */
 	public function save ( $frequency = null ) {
 		if ( !is_numeric($this->value) || !is_numeric($this->metricID) ) return false;
@@ -44,17 +44,17 @@ class MetricRecording {
             $result = dbQuery($sql);  //echo $sql;
             if ( !$result ) return false;
         }
-		
+
 		// record the metric
 		$sql = "INSERT INTO metricRecordings (recorded,value,metricID) VALUES ('".date("Y-m-d H:i:s",$this->recorded)."',$this->value,$this->metricID);";
 		//echo $sql;
 		$result = dbQuery($sql);
 		if ( !$result ) return false;
-		
+
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Delete a record with the specified values, but just one
 	 * @return boolean Success
@@ -70,8 +70,8 @@ class MetricRecording {
 		if ( mysql_affected_rows() == 1 ) return true;
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Get the recordings for a given metric
 	 * @param int $metricID
@@ -79,35 +79,36 @@ class MetricRecording {
      * @param string $frequency Daily, hourly, etc.
      * @param string $from The date of recordings to start at (mutually exclusive with $count)
      * @param string $to The date of recordings to stop at
-	 * @return array An array of MetricRecording objects 
+	 * @return array An array of MetricRecording objects
 	 */
 	public static function getRecordings ( $metricID, $count=null, $frequency=null, $from=null, $to=null ) {
 		if ( !is_numeric($metricID) ) return null;
-        if ( isset($frequency) && !in_array($frequency, Metric::$frequencies)) return null;  // must be a valid frequency
+    if ( isset($frequency) && !in_array($frequency, Metric::$frequencies)) return null;  // must be a valid frequency
 
-        $sql = "SELECT value, sum(value) as v, recorded FROM metricRecordings WHERE metricID=$metricID";
-        if ( isset($from) ) $sql .= " AND recorded>='".date('Y-m-d',strtotime($from))."'";
-        if ( isset($to) ) $sql .= " AND recorded<'".date('Y-m-d',strtotime($to))."'";
-        if ( $frequency == 'monthly' ) {
-            $sql .= ' GROUP BY year(recorded), month(recorded)';
-        } else if ( $frequency == 'daily' ) {
-            $sql .= ' GROUP BY date(recorded)';
-        } else if ( $frequency == 'hourly' ) {
-            $sql .= ' GROUP BY date(recorded), hour(recorded)';
-        } else if ( $frequency == 'minutely' ) {
-            $sql .= ' GROUP BY date(recorded), hour(recorded), minute(recorded)';
-        }
-        $sql .= ' ORDER BY recorded DESC';
+    $sql = "SELECT SUM(value) v, MAX(recorded) r FROM metricRecordings WHERE metricID=$metricID";
+    if ( isset($from) ) $sql .= " AND recorded>='".date('Y-m-d',strtotime($from))."'";
+    if ( isset($to) ) $sql .= " AND recorded<'".date('Y-m-d',strtotime($to))."'";
+    if ( $frequency == 'monthly' ) {
+        $sql .= ' GROUP BY year(recorded), month(recorded)';
+    } else if ( $frequency == 'daily' ) {
+        $sql .= ' GROUP BY date(recorded)';
+    } else if ( $frequency == 'hourly' ) {
+        $sql .= ' GROUP BY date(recorded), hour(recorded)';
+    } else if ( $frequency == 'minutely' ) {
+        $sql .= ' GROUP BY date(recorded), hour(recorded), minute(recorded)';
+    }
+    $sql .= ' ORDER BY MAX(recorded) DESC';
 		if ( is_numeric($count) ) $sql .= " LIMIT $count;";
-        //die($sql);
-		$result = dbQuery($sql);
+    //die($sql);
 		$recordings = array();
-		while ( $row = $result->fetch_array() ) {
-			$recording = new MetricRecording ();
-			$recording->recorded = $row['recorded'];
-            $recording->value = $row['v'];
-            //$recording->value = $row['value'];
-			$recordings []= $recording;
+		if ( $result = dbQuery($sql) ) {
+			while ( $row = $result->fetch_array() ) {
+				$recording = new MetricRecording ();
+				$recording->recorded = $row['r'];
+	            $recording->value = $row['v'];
+	            //$recording->value = $row['value'];
+				$recordings []= $recording;
+			}
 		}
 		return $recordings;
 	}

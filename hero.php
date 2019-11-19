@@ -14,7 +14,7 @@ require 'metric-functions.inc';
 //print_r($metric);
 
 // Grab since the last Fall semester
-$metric->getRecordings(null,'daily',"2015-08-01","tomorrow");
+$metric->getRecordings(null,'daily',"last August","tomorrow");
 
 // get this year's and the last year comparison
 $r1 = array();
@@ -22,8 +22,9 @@ $r2 = array();
 $runningTotal = 0;
 foreach ( $metric->recordings as $recording ) {
   $date = date("Y-m",strtotime($recording->recorded));
-  if ( $recording->recorded >= '2015-08-01' && $recording->recorded < '2016-01-01' ) $r1[]= $recording;
-  else if ( $recording->recorded >= '2016-08-01' ) {
+  //die("Comparing $date to ".date('Y-m-d',$config->startTime-(365*24*60*60)).' and '.date('Y-m-d',$config->endTime-(365*24*60*60)).' and '.date('Y-m-d',$config->startTime));
+  if ( $recording->recorded >= date('Y-m-d',$config->startTime-(365*24*60*60)) && $recording->recorded < date('Y-m-d',$config->endTime-(365*24*60*60)) ) $r1[]= $recording;
+  else if ( $recording->recorded >= date('Y-m-d',$config->startTime) ) {  // period, this year
       $r2[]= $recording;
       $runningTotal += $recording->value;
   }
@@ -36,7 +37,10 @@ if ( count($r2) == 0 ) {  // what? nothing in this year?
   $value = number_format($r2[count($r2)-1]->value);
   $caption = date("F jS",strtotime($r2[count($r2)-1]->recorded));
 }
-$runningTotal = number_format($runningTotal);
+if ( $metric->type == 'percentage' ) $runningTotal = $runningTotal/count($r2);
+//$runningTotal = number_format($runningTotal);
+$runningTotal = $metric->value($runningTotal);
+
 
 
 
@@ -64,7 +68,7 @@ if ( $showHeading ) showHeader($metric->name);
   <h1><?php echo $metric->name; ?></h1>
 
   <div class="today">
-    <div class="value"><?php echo $value; ?></div>
+    <div class="value"><?php echo $metric->value($value); ?></div>
     <div class="caption"><?php echo $caption; ?></div>
   </div>
 
@@ -84,7 +88,7 @@ if ( $showHeading ) showHeader($metric->name);
     ['Date', 'Last Year' <?php if ( isset($r2) ) echo ", 'This Year'"; ?> ],
         <?php $max = isset($r2) ? max(count($r2),count($r1)) : count($r1); // how many data points to show ?>
     <?php for ( $i = 0; $i < $max; $i++ ) { ?>
-    ['<?php echo date("j-M",strtotime($r1[$i]->recorded)); ?>',  <?php echo $metric->value($r1[$i]->value,true); ?> <?php if ( isset($r2) ) echo ", ".$metric->value($r2[$i]->value,true); ?>],
+    ['<?php echo @date("j-M",strtotime($r1[$i]->recorded)); ?>',  <?php echo @$metric->value($r1[$i]->value,true); ?> <?php if ( isset($r2) ) echo ", ".@$metric->value($r2[$i]->value,true); ?>],
     <?php } ?>
   ]);
 

@@ -82,8 +82,8 @@ class Metric {
 	 * @return array An array of MetricRecording objects
 	 */
 	public function getRecordings ( $count=null, $frequency=null, $from=null, $to=null ) {
-        if ( isset($frequency) && !in_array($frequency,Metric::$frequencies) ) return null;  // illegal frequency
-        if ( !isset($frequency) ) $frequency = $this->frequency; // default to the metric's frequency
+    if ( isset($frequency) && !in_array($frequency,Metric::$frequencies) ) return null;  // illegal frequency
+    if ( !isset($frequency) ) $frequency = $this->frequency; // default to the metric's frequency
 		$this->recordings = MetricRecording::getRecordings($this->metricID,$count,$frequency,$from,$to);
 		usort($this->recordings,"MetricRecording::sortByDate");
 		return $this->recordings;
@@ -155,7 +155,7 @@ class Metric {
 	 */
 	public function value ( $value=null, $justNumber=false, $precision=null ) {
 		$precision = isset($precision) ? $precision : isset($this->precision) ? $this->precision : null;
-    if ( !isset($value) ) $value = $this->value;
+    if ( !isset($value) ) $value = isset($this->value)?$this->value:null;
     if ( $this->type == 'integer' ) return round($value);
 		if ( $this->type == 'percentage' ) {
             if ( isset($precision) ) {
@@ -167,6 +167,11 @@ class Metric {
             }
         }
         else if ( isset($precision) ) {
+						$value = str_replace(',','',$value);
+						if ( !is_numeric($value) ) {
+							return 0;// $value; //
+							//die("What is this value '$value'?");
+						}
             if ( $justNumber ) return round($value,$precision);
             return number_format($value,$precision);
         }
