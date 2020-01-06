@@ -78,8 +78,6 @@ if ( $showHeading ) showHeader($metric->name);
 <div id="chart_div" style="width: 400px; height: 400px;"></div>
 
 
-
-
 <?php
 exit();
 ?>
