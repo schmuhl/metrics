@@ -2,7 +2,6 @@
 
 session_start();
 
-date_default_timezone_set('America/Denver');
 
 // are you an admin?
 if ( isset($_GET['admin']) ) $_SESSION['admin'] = true;
@@ -11,17 +10,20 @@ if ( !isset($_SESSION['admin']) ) $_SESSION['admin'] = false;
 
 
 // read the configuration
-if ( $config = file_get_contents("configuration.json") ) {
+$configPath = '../config-metrics.json';
+if ( $config = file_get_contents($configPath) ) {
     $config = json_decode($config);
     // @todo check to make sure all the config is there
     if ( !isset($config->timezone) ) $config->timezone = 'UTC';
     if ( !isset($config->errors) ) $config->errors = false;
     if ( !isset($config->database) ) die("Database settings are required.");
+    date_default_timezone_set($config->timezone);
 } else {
     // create a dummy config file
     $json = new stdClass();
     $json->name = 'Metrics';
     $json->timezone = 'UTC';
+    $json->errors = 1;
     $json->database = new stdClass();
     $json->database->host = '127.0.0.1';
     $json->database->database = 'metrics';
@@ -29,7 +31,7 @@ if ( $config = file_get_contents("configuration.json") ) {
     $json->database->password = 'root';
 
     // attempt to write the configuration file
-    if ( !file_put_contents('configuration.json',json_encode($json)) ) {
+    if ( !file_put_contents($configPath,json_encode($json)) ) {
         die('Cannot create configuration file (which is probably good) so you will need to make it yourself or give more access to this directory (scary).');
     }
 
@@ -274,19 +276,4 @@ function dbError () {
 }
 
 
-/**
- * @deprecated
- */
-function dbSetup () {
-    global $dbHOST;
-    global $dbUSER;
-    global $dbPASSWORD;
-    global $dbNAME;
-
-    mysql_connect($dbHOST,$dbUSER,$dbPASSWORD) or die(mysql_error());
-    mysql_query("DROP DATABASE $dbNAME;") or die(mysql_error());
-    mysql_query("CREATE DATABASE $dbNAME;") or die(mysql_error());
-    mysql_query("USE $dbNAME") or die(mysql_error());
-    addMessage("Database has been created.");
-}
 ?>

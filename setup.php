@@ -10,6 +10,7 @@ require 'template.inc';
 
 showHeader("Setup");
 
+
 if ( Metric::createTable() ) echo "Tables have been created.";
 else echo "Tables could not be created.";
 ?>
