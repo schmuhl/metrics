@@ -8,5 +8,6 @@
 .idea/workspace.xml
 .idea
 npm-*
+config.inc
 configuration.json
 config-metrics.json

@@ -78,24 +78,17 @@ if ( $showHeading ) showHeader($metric->name);
 <div id="chart_div" style="width: 400px; height: 400px;"></div>
 
 
+<style>
+  BODY DIV#body { width: auto; background: #fff; margin: 0; }
+  DIV#body HEADER { width: auto; }
+  DIV#body DIV.content { margin: 0; padding: 10px; width: auto; }
+</style>
+
 <?php
 exit();
 ?>
 
 
-<style>
-  DIV#body { width: auto; background: white; }
-  DIV#body HEADER { width: auto; }
-  DIV#body DIV.content { margin: 0; padding: 0; width: auto; }
-
-  DIV.hero { margin: 0 auto; width: 1900px; height: auto; padding: 0 0 20px 0; background: white; display: block; overflow: hidden; }
-  DIV.hero H1 { margin: 20px 0 50px 0; padding: 0; font-size: 90px; text-align: center; line-height: 120px; }
-  DIV.hero DIV.today { float: left; margin: 50px 0 0 20px; border: 2px solid black; width: 600px; height: 350px; text-align: center; overflow: hidden; }
-  DIV.hero DIV.today DIV.value { height: 250px; font-size: 170px; line-height: 250px; }
-  DIV.hero DIV.today DIV.caption { hight: 100px; background: gray; color: white; font-size: 60px; line-height: 100px; }
-  DIV.hero DIV#chart_div { float: right; margin: -50px 0 50px 0 !important; border: none; padding: 0 !important; width: 1200px !important; height: 600px !important; overflow: hidden; }
-  DIV.hero DIV.total { clear: both; float: none; display: block; margin: 15px 0 40px 0; color: #dc3912; border: 0px solid #dc3912; background: #f5c4b8; font-size: 60px; line-height: 100px; text-align: center;  }
-</style>
 
 
 <div class="hero">
