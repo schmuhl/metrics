@@ -10,7 +10,7 @@ if ( !isset($_SESSION['admin']) ) $_SESSION['admin'] = false;
 
 
 // read the configuration
-$configPath = '../config-metrics.json';
+require_once 'config.inc';
 if ( $config = file_get_contents($configPath) ) {
     $config = json_decode($config);
     // @todo check to make sure all the config is there

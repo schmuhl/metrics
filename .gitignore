@@ -9,3 +9,4 @@
 .idea
 npm-*
 configuration.json
+config-metrics.json
