@@ -87,6 +87,7 @@ function showHeader ( $title=null ) {
         <title><?php echo $title; ?></title>
         <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
         <link href="style.css" rel="stylesheet" />
+        <meta name="viewport" content ="width=device-width,initial-scale=1,user-scalable=yes" />
     </head>
     <body>
         <div id="body">
