@@ -274,7 +274,11 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
     Standard Deviation: <?php echo $metric->value($stdDev,true); ?>
     Margin of Error: &plusmn;<?php echo $metric->value($moe,true); ?> or <?php echo $metric->value($average-$moe); ?> to <?php echo $metric->value($average+$moe); ?>
 </div>
-<div><a href="hero.php?metric=<?php echo $metric->metricID; ?>">Wallboard view</a></div>
+<div>
+	View as:
+	<a href="hero.php?metric=<?php echo $metric->metricID; ?>">Wallboard</a>
+	| <a href="barometer.php?metric=<?php echo $metric->metricID; ?>">Barometer</a>
+</div>
 
 
 <form action="metric.php" method="post" style="display: none;" id="editMetricForm">

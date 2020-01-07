@@ -15,7 +15,7 @@ require 'metric-functions.inc';
 
 // Grab since the last Fall semester
 $metric->getRecordings(null,$metric->frequency,"-7days","tomorrow");
-//print_r($metric);
+//echo '<pre>'.print_r($metric,true).'</pre>';
 $min = null;
 $max = null;
 $sum = 0;
@@ -46,7 +46,7 @@ if ( $showHeading ) showHeader($metric->name);
 
         var data = google.visualization.arrayToDataTable([
           ['Label', 'Value'],
-          ['hPA', <?php echo $metric->value($pressure); ?>]
+          ['hPa', <?php echo $metric->value($pressure); ?>]
         ]);
 
         var options = {
@@ -72,10 +72,44 @@ if ( $showHeading ) showHeader($metric->name);
       }
     </script>
 
-
 <h1><?php echo $metric->name; ?></h1>
 <p><?php echo $metric->description; ?></p>
 <div id="chart_div" style="width: 400px; height: 400px;"></div>
+
+
+
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Recorded', 'hPa'],
+      <?php
+      foreach ( $metric->recordings as $recording ) {
+        echo "['".date("D ga",strtotime($recording->recorded))."',$recording->value],";
+      }
+      ?>
+    ]);
+
+    var options = {
+      title: 'Over the past week',
+      legend: { position: 'none' },
+      curveType: 'function'
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+    chart.draw(data, options);
+  }
+</script>
+
+<div id="curve_chart" style="width: 100%; height: 200px;"></div>
+
+
+
+
+
 
 
 <style>
