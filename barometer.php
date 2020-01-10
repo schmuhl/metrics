@@ -75,7 +75,7 @@ if ( $showHeading ) showHeader($metric->name);
     </script>
 
 <h1><?php echo $metric->name; ?></h1>
-<p><?php echo $metric->description; ?></p>
+<p><?php echo $metric->description; ?><br/>Measurements over 1022 are considered high pressure and below 1009 is considered low pressure.</p>
 <div id="chart_div" style="width: 400px; height: 400px;"></div>
 
 
