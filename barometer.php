@@ -25,6 +25,8 @@ foreach ( $metric->recordings as $recording ) {
   $sum += $recording->value;
 }
 $average = $sum/count($metric->recordings);
+$yellow = 1009;
+$red = 1022;
 
 $pressure = $metric->getLastRecording();
 //print_r($pressure);
@@ -53,9 +55,9 @@ if ( $showHeading ) showHeader($metric->name);
           //animation.easing: 'inAndOut',
           width: 400, height: 400,
           min: <?php echo $min; ?>, max: <?php echo $max; ?>,
-          yellowFrom:  <?php echo $min; ?>, yellowTo: <?php echo ($min+$average)/2; ?>,
-          greenFrom: <?php echo ($min+$average)/2; ?>, greenTo: <?php echo ($max+$average)/2; ?>,
-          redFrom: <?php echo ($max+$average)/2; ?>, redTo: <?php echo $max; ?>,
+          yellowFrom:  <?php echo $min; ?>, yellowTo: <?php echo max($min,$yellow); ?>,
+          greenFrom: <?php echo max($min,$yellow); ?>, greenTo: <?php echo min($max,$red); ?>,
+          redFrom: <?php echo min($max,$red); ?>, redTo: <?php echo $max; ?>,
           minorTicks: 5
         };
 
