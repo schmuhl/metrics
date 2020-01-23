@@ -85,6 +85,7 @@ class Metric {
     if ( isset($frequency) && !in_array($frequency,Metric::$frequencies) ) return null;  // illegal frequency
     if ( !isset($frequency) ) $frequency = $this->frequency; // default to the metric's frequency
 		$this->recordings = MetricRecording::getRecordings($this->metricID,$count,$frequency,$from,$to);
+		if ( !is_array($this->recordings) ) $this->recordings = array();
 		usort($this->recordings,"MetricRecording::sortByDate");
 		return $this->recordings;
 	}
