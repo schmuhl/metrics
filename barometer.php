@@ -100,9 +100,9 @@ if ( $showHeading ) showHeader($heading);
 <h1><?php echo $heading; ?></h1>
 <p><?php echo $metric->description; ?><br/>Measurements over 1022 are considered high pressure and below 1009 is considered low pressure.</p>
 <p>
-  <a href="barometer.php?metric=<?php echo $metric->metricID; ?>&from=<?php echo date('n/d/Y',$startTime-60*60*24*7); ?>"><<</a>
+  <a href="barometer.php?metric=<?php echo $metric->metricID; ?>&event=<?php if ( isset($even) ) echo $event->metricID; ?>&from=<?php echo date('n/d/Y',$startTime-60*60*24*7); ?>"><<</a>
   Showing <?php echo date('n/d/Y',$startTime); ?> through <?php echo date('n/d/Y',$endTime); ?>.
-  <a href="barometer.php?metric=<?php echo $metric->metricID; ?>&from=<?php echo date('n/d/Y',$startTime+60*60*24*7); ?>">>></a>
+  <a href="barometer.php?metric=<?php echo $metric->metricID; ?>&event=<?php if ( isset($even) ) echo $event->metricID; ?>&from=<?php echo date('n/d/Y',$startTime+60*60*24*7); ?>">>></a>
 </p>
 <div id="chart_div" style="width: 400px; height: 400px;"></div>
 
