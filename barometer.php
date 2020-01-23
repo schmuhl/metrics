@@ -131,7 +131,8 @@ if ( $showHeading ) showHeader($heading);
             $v2 = $r->value;
           }
         }
-        echo "['".date("D ga",strtotime($recording->recorded))."',$recording->value,$v2],";
+        //echo "['".date("D ga",strtotime($recording->recorded))."',$recording->value,$v2],";
+        echo "['".date("n/d ga",strtotime($recording->recorded))."',$recording->value,$v2],";
       }
       ?>
     ]);
