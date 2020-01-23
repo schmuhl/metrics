@@ -1,6 +1,6 @@
 <?php
 
-require 'template.inc';
+require "includes/template.inc";
 if ( !isset($_SESSION['admin']) || !$_SESSION['admin'] ) {
     $_SESSION['admin'] = true;
     addMessage("You have been logged in as an admin.");

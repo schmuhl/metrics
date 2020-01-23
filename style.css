@@ -6,6 +6,12 @@ H2 { font-size: 18px; }
 A { text-decoration: none; }
 A:hover { text-decoration: underline; }
 P { margin: 5px 0; }
+
+
+DIV#messagesBox {}
+DIV#messagesBox UL#mesages {}
+
+
 DIV#chart_div { width: 900px; height: 400px; }
 
 DIV#body { margin: 0 auto; width: 1200px; background: white; }
@@ -20,3 +26,5 @@ DIV#body DIV.content DIV#chart_div { margin: 20px 0 0 0; width: 1150px; height: 
 
 DIV#metricLegend { float: right; border: 1px solid gray; padding: 5px; background: #eee; }
 DIV#metricLegend FORM { margin: 0 0 5px 0; }
+
+DIV#addData { float: right; border: 1px solid gray; padding: 5px; background: #eee; }

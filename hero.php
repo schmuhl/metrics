@@ -7,10 +7,10 @@
  */
 
 
-require "template.inc";
+require "includes/template.inc";
 
 // load the given metric and related info
-require 'metric-functions.inc';
+require 'includes/metric-functions.inc';
 //print_r($metric);
 
 // Grab since the last Fall semester

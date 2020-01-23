@@ -7,10 +7,10 @@
  */
 
 
-require "template.inc";
+require "includes/template.inc";
 
 // load the given metric and related info
-require 'metric-functions.inc';
+require 'includes/metric-functions.inc';
 //print_r($metric);
 
 // Grab since the last Fall semester
@@ -24,7 +24,7 @@ foreach ( $metric->recordings as $recording ) {
   if ( $recording->value > $max || !isset($max) ) $max = $recording->value;
   $sum += $recording->value;
 }
-$average = $sum/count($metric->recordings);
+if ( count($metric->recordings) > 0 ) $average = $sum/count($metric->recordings); else $average = 0;
 $yellow = 1009;
 $red = 1022;
 
@@ -33,9 +33,16 @@ $pressure = $metric->getLastRecording();
 $pressure=$pressure->value;
 
 
+if ( isset($_GET['events']) ) {
+  $events = new Metric($_GET['events']);
+  $events->getRecordings(null,$events->frequency,"-7days","tomorrow"); /* @todo possible frequency mismatch here */
+  $heading = $metric->name.' with '.$events->name;
+} else {
+  $heading = $metric->name;
+}
 
 
-if ( $showHeading ) showHeader($metric->name);
+if ( $showHeading ) showHeader($heading);
 ?>
 
 
@@ -74,35 +81,61 @@ if ( $showHeading ) showHeader($metric->name);
       }
     </script>
 
-<h1><?php echo $metric->name; ?></h1>
+<h1><?php echo $heading; ?></h1>
 <p><?php echo $metric->description; ?><br/>Measurements over 1022 are considered high pressure and below 1009 is considered low pressure.</p>
 <div id="chart_div" style="width: 400px; height: 400px;"></div>
 
 
 
 <script type="text/javascript">
-  google.charts.load('current', {'packages':['corechart']});
+  google.charts.load('current', {'packages':['line', 'corechart']});
   google.charts.setOnLoadCallback(drawChart);
 
   function drawChart() {
-    var data = google.visualization.arrayToDataTable([
-      ['Recorded', 'hPa'],
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Day');
+    data.addColumn('number', "<?php echo $metric->name; ?>");
+    data.addColumn('number', "<?php if ( isset($events->name) ) echo $events->name; ?>");
+
+    data.addRows([
+      //[new Date(2014, 0),  -.5,  5.7],
       <?php
       foreach ( $metric->recordings as $recording ) {
-        echo "['".date("D ga",strtotime($recording->recorded))."',$recording->value],";
+        /* @todo Need to be more sensitive to the different frequencies. Here I'm hacking for hourly barometer and daily migraines :( */
+        $v2 = 0;
+        if ( isset($events) ) foreach ( $events->recordings as $r ) {
+          //echo "Comparing ".date('Y-m-d',strtotime($recording->recorded))." with ".date('Y-m-d',strtotime($r->recorded));
+          if ( date('Y-m-d',strtotime($recording->recorded)) == date('Y-m-d',strtotime($r->recorded)) ) {
+            $v2 = $r->value;
+          }
+        }
+        echo "['".date("D ga",strtotime($recording->recorded))."',$recording->value,$v2],";
       }
       ?>
     ]);
 
-    var options = {
-      title: 'Over the past week',
-      legend: { position: 'none' },
-      curveType: 'function'
+    var materialOptions = {
+      chart: {
+        title: '<?php echo $heading; ?>'
+      },
+      //width: 900,
+      //height: 500,
+      series: {
+        // Gives each series an axis name that matches the Y-axis below.
+        0: {axis: 'Temps', type: 'line'}, // https://developers.google.com/chart/interactive/docs/gallery/combochart
+        1: {axis: 'Daylight', type: 'bars'}
+      },
+      axes: {
+        // Adds labels to each axis; they don't have to match the axis names.
+        y: {
+          Temps: {label: 'hPa'},
+          Daylight: {label: ''}
+        }
+      }
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-    chart.draw(data, options);
+    var materialChart = new google.charts.Line(document.getElementById('curve_chart'));
+    materialChart.draw(data, materialOptions);
   }
 </script>
 

@@ -22,7 +22,7 @@ class Metric {
 	var $recordings;
 
   var $precision = 3;
-	static $types = array('decimal','integer','percentage');
+	static $types = array('decimal','integer','percentage','event');
 	static $frequencies = array('monthly','daily','hourly','minutely');
 
 

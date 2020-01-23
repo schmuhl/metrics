@@ -5,7 +5,7 @@
  */
 
 
-require 'template.inc';
+require "includes/template.inc";
 $metrics = Metric::getAllMetrics();
 //print_r($metrics);
 $lastMonth = date('Y-m',strtotime('last month'));

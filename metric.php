@@ -1,7 +1,7 @@
 <?php
 
 
-require "template.inc";
+require "includes/template.inc";
 
 // Create a new metric
 if ( isset($_GET['metric']) && 'new' == $_GET['metric'] ) {
@@ -280,7 +280,6 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 	| <a href="barometer.php?metric=<?php echo $metric->metricID; ?>">Barometer</a>
 </div>
 
-
 <form action="metric.php" method="post" style="display: none;" id="editMetricForm">
 	<h2>Edit Metric</h2>
 	<div>
@@ -344,8 +343,17 @@ if ( $showHeading ) showHeader("Metrics: $metric->name");
 <?php } ?>
 
 
-<?php if ( $showRecordings ) { ?>
+<?php if ( $showRecordings ) {  ?>
 <h2>Data</h2>
+
+<div id="addData">
+	<label for="addDataDate">Date:</label>
+	<input id="addDataDate" type="text" value="" />
+	<label for="addDataValue">Value:</label>
+	<input id="addDataValue" type="text" value="" />
+	<button onclick="if ( addData(<?php echo $metric->metricID; ?>,$('#addDataDate').val(),$('#addDataValue').val()) ) { $('#addDataDate').val(''); $('#addDataValue').val(''); }">Save</button>
+</div>
+
 <table>
 	<tr>
 		<th>Recorded</th>

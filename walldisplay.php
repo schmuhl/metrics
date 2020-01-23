@@ -1,7 +1,7 @@
 <?php
 
 
-require "template.inc";
+require "includes/template.inc";
 
 $metrics = array();
 

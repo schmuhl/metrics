@@ -86,6 +86,7 @@ function showHeader ( $title=null ) {
     <head>
         <title><?php echo $title; ?></title>
         <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script type="text/javascript" src="script.js"></script>
         <link href="style.css" rel="stylesheet" />
         <meta name="viewport" content ="width=device-width,initial-scale=1,user-scalable=yes" />
     </head>
@@ -95,7 +96,7 @@ function showHeader ( $title=null ) {
                 <div id="title">
                     <a href="index.php"><?php echo $config->name; ?></a>
                 </div>
-                <div id="messages">
+                <div id="messagesBox">
                     <?php
                     $messages = getMessages();
                     if ( count($messages) > 0 ) {
