@@ -51,7 +51,7 @@ $pressure=$pressure->value;
 
 if ( isset($_GET['events']) ) {
   $events = new Metric($_GET['events']);
-  $events->getRecordings(null,$events->frequency,"-7days","tomorrow"); /* @todo possible frequency mismatch here */
+  $events->getRecordings(null,$events->frequency,$startTime,$endTime); /* @todo possible frequency mismatch here */
   $heading = $metric->name.' with '.$events->name;
 } else {
   $heading = $metric->name;
@@ -77,7 +77,7 @@ if ( $showHeading ) showHeader($heading);
         var options = {
           //animation.easing: 'inAndOut',
           width: 400, height: 400,
-          min: <?php echo $min; ?>, max: <?php echo $max; ?>,
+          min: <?php if ( is_numeric($min) ) echo $min; else echo '0'; ?>, max: <?php if ( is_numeric($max) ) echo $max; else echo '0'; ?>,
           yellowFrom:  <?php echo $min; ?>, yellowTo: <?php echo max($min,$yellow); ?>,
           greenFrom: <?php echo max($min,$yellow); ?>, greenTo: <?php echo min($max,$red); ?>,
           redFrom: <?php echo min($max,$red); ?>, redTo: <?php echo $max; ?>,

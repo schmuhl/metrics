@@ -85,6 +85,9 @@ class MetricRecording {
 		if ( !is_numeric($metricID) ) return null;
     if ( isset($frequency) && !in_array($frequency, Metric::$frequencies)) return null;  // must be a valid frequency
 
+		if ( is_numeric($from) ) $from = date('Y-m-d',$from);
+		if ( is_numeric($to) ) $to = date('Y-m-d',$to);
+
     $sql = "SELECT SUM(value) v, MAX(recorded) r FROM metricRecordings WHERE metricID=$metricID";
     if ( isset($from) ) $sql .= " AND recorded>='".date('Y-m-d',strtotime($from))."'";
     if ( isset($to) ) $sql .= " AND recorded<'".date('Y-m-d',strtotime($to))."'";
