@@ -13,8 +13,24 @@ require "includes/template.inc";
 require 'includes/metric-functions.inc';
 //print_r($metric);
 
+
+// what date range?
+if ( isset($_GET['from']) ) {
+  $startTime = strtotime($_GET['from']);
+  if ( isset($_GET['to']) ) {
+    $endTime = strtotime($_GET['to']);
+  } else {
+    $endTime = $startTime + 60*60*24*7;
+  }
+} else {
+  $startTime = strtotime("-7days");
+  $endTime = strtotime("tomorrow");
+}
+
+
+
 // Grab since the last Fall semester
-$metric->getRecordings(null,$metric->frequency,"-7days","tomorrow");
+$metric->getRecordings(null,$metric->frequency,$startTime,$endTime);
 //echo '<pre>'.print_r($metric,true).'</pre>';
 $min = null;
 $max = null;
@@ -83,6 +99,11 @@ if ( $showHeading ) showHeader($heading);
 
 <h1><?php echo $heading; ?></h1>
 <p><?php echo $metric->description; ?><br/>Measurements over 1022 are considered high pressure and below 1009 is considered low pressure.</p>
+<p>
+  <a href="barometer.php?metric=<?php echo $metric->metricID; ?>&from=<?php echo date('n/d/Y',$startTime-60*60*24*7); ?>"><<</a>
+  Showing <?php echo date('n/d/Y',$startTime); ?> through <?php echo date('n/d/Y',$endTime); ?>.
+  <a href="barometer.php?metric=<?php echo $metric->metricID; ?>&from=<?php echo date('n/d/Y',$startTime+60*60*24*7); ?>">>></a>
+</p>
 <div id="chart_div" style="width: 400px; height: 400px;"></div>
 
 
